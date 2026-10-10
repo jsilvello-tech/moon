@@ -1,0 +1,42 @@
+export struct StorageItem {
+    name: string,
+    mount_point: string,
+    fs_type: string,
+    total_gb: string,
+    used_gb: string,
+    free_gb: string,
+    usage_percent: float,
+}
+
+export struct CoreUsage {
+    core_index: int,
+    usage: float,
+    frequency_mhz: int,
+}
+
+export struct TopProcessRam {
+    pid: int,
+    name: string,
+    memory_formatted: string,
+    memory_percent: float,
+}
+
+export struct GpuAdapterInfo {
+    index: int,
+    name: string,
+    vendor: string,
+    dedicated_vram: string,
+    shared_vram: string,
+    utilization: string,
+    temperature: string,
+    clock: string,
+}
+
+export struct ProcessItem {
+    pid: int,
+    name: string,
+    cpu_percent: float,
+    cpu_formatted: string,
+    memory_formatted: string,
+    memory_bytes: int,
+}

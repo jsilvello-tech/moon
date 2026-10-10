@@ -135,7 +135,7 @@ impl MoonMonitorApp {
         });
 
         // 3. Seleção de Processo
-        main_window.on_process_selected(|pid, name, cpu, mem| {
+        main_window.on_process_selected(move |pid, name, cpu, mem| {
             info!("Processo selecionado: PID {pid} ({name}) - CPU {cpu}, RAM {mem}");
         });
 

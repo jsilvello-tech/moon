@@ -4,15 +4,7 @@ import { MoonSparkline } from "../components/sparkline.slint";
 import { MoonProgressBar } from "../components/progress_bar.slint";
 import { LunarPhaseIndicator } from "../components/lunar_phase.slint";
 
-export struct StorageItem {
-    name: string,
-    mount_point: string,
-    fs_type: string,
-    total_gb: string,
-    used_gb: string,
-    free_gb: string,
-    usage_percent: float,
-}
+import { StorageItem } from "../models.slint";
 
 export component DashboardPage {
     // System Info

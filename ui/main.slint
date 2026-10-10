@@ -1,14 +1,13 @@
+export * from "models.slint";
 import { Theme } from "themes/palette.slint";
 import { MoonSidebar } from "components/sidebar.slint";
-import { DashboardPage, StorageItem } from "pages/dashboard.slint";
-import { CpuPage, CoreUsage } from "pages/cpu_page.slint";
-import { MemoryPage, TopProcessRam } from "pages/memory_page.slint";
-import { GpuPage, GpuAdapterInfo } from "pages/gpu_page.slint";
+import { DashboardPage } from "pages/dashboard.slint";
+import { CpuPage } from "pages/cpu_page.slint";
+import { MemoryPage } from "pages/memory_page.slint";
+import { GpuPage } from "pages/gpu_page.slint";
 import { StoragePage } from "pages/storage_page.slint";
-import { ProcessesPage, ProcessItem } from "pages/processes_page.slint";
+import { ProcessesPage } from "pages/processes_page.slint";
 import { SettingsPage } from "pages/settings_page.slint";
-
-export { StorageItem, CoreUsage, TopProcessRam, GpuAdapterInfo, ProcessItem }
 
 export component MainWindow inherits Window {
     title: "Moon Monitor — Keep your system in orbit";

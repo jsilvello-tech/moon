@@ -2,14 +2,7 @@ import { Theme } from "../themes/palette.slint";
 import { MoonCard } from "../components/card.slint";
 import { MoonBadge } from "../components/badge.slint";
 
-export struct ProcessItem {
-    pid: int,
-    name: string,
-    cpu_percent: float,
-    cpu_formatted: string,
-    memory_formatted: string,
-    memory_bytes: int,
-}
+import { ProcessItem } from "../models.slint";
 
 export component ProcessesPage {
     in property <[ProcessItem]> processes: [];

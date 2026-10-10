@@ -4,11 +4,7 @@ import { MoonSparkline } from "../components/sparkline.slint";
 import { MoonProgressBar } from "../components/progress_bar.slint";
 import { LunarPhaseIndicator } from "../components/lunar_phase.slint";
 
-export struct CoreUsage {
-    core_index: int,
-    usage: float,
-    frequency_mhz: int,
-}
+import { CoreUsage } from "../models.slint";
 
 export component CpuPage {
     in property <string> cpu_model: "Detectando...";

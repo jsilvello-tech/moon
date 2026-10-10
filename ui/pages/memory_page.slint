@@ -3,12 +3,7 @@ import { MoonCard } from "../components/card.slint";
 import { MoonSparkline } from "../components/sparkline.slint";
 import { MoonProgressBar } from "../components/progress_bar.slint";
 
-export struct TopProcessRam {
-    pid: int,
-    name: string,
-    memory_formatted: string,
-    memory_percent: float,
-}
+import { TopProcessRam } from "../models.slint";
 
 export component MemoryPage {
     in property <string> ram_total: "0 GiB";

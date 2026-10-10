@@ -26,7 +26,7 @@ jobs:
         run: cargo fmt --check
 
       - name: Run Cargo Check
-        run: cargo check
+        run: cargo check --verbose
 
       - name: Run Clippy Linter
         run: cargo clippy --all-targets

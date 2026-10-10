@@ -2,16 +2,7 @@ import { Theme } from "../themes/palette.slint";
 import { MoonCard } from "../components/card.slint";
 import { MoonProgressBar } from "../components/progress_bar.slint";
 
-export struct GpuAdapterInfo {
-    index: int,
-    name: string,
-    vendor: string,
-    dedicated_vram: string,
-    shared_vram: string,
-    utilization: string,
-    temperature: string,
-    clock: string,
-}
+import { GpuAdapterInfo } from "../models.slint";
 
 export component GpuPage {
     in property <[GpuAdapterInfo]> adapters: [];
