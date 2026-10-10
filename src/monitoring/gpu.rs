@@ -41,7 +41,7 @@ impl GpuCollector {
                         .to_string();
 
                         // Ignora adaptadores de renderização puramente por software se houver outros
-                        let is_software = (desc.Flags & 2) != 0 || desc.VendorId == 0x1414;
+                        let is_software = desc.VendorId == 0x1414;
 
                         // Se não for puramente software ou se for o único até o momento
                         if !is_software || adapters.is_empty() {

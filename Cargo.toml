@@ -29,6 +29,7 @@ directories = "5.0"
 version = "0.58"
 features = [
     "Win32_Graphics_Dxgi",
+    "Win32_Graphics_Dxgi_Common",
     "Win32_Foundation",
     "Win32_System_SystemInformation",
     "Win32_System_Threading",
