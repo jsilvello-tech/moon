@@ -7,13 +7,8 @@ use crate::models::{
     system::SystemInfoMetrics,
 };
 use crate::monitoring::{
-    cpu::CpuCollector,
-    gpu::GpuCollector,
-    memory::MemoryCollector,
-    processes::ProcessesCollector,
-    self_monitor::SelfMonitor,
-    storage::StorageCollector,
-    system::SystemInfoCollector,
+    cpu::CpuCollector, gpu::GpuCollector, memory::MemoryCollector, processes::ProcessesCollector,
+    self_monitor::SelfMonitor, storage::StorageCollector, system::SystemInfoCollector,
 };
 use sysinfo::System;
 
@@ -88,7 +83,8 @@ impl CentralCollector {
         let gpu = self.gpu_collector.collect();
         let storage = self.storage_collector.collect();
         let (processes, total_process_count) =
-            self.processes_collector.collect(&mut self.sys, search_query, sort_order, 50);
+            self.processes_collector
+                .collect(&mut self.sys, search_query, sort_order, 50);
         let system_info = self.system_collector.collect(&self.sys);
         let (self_cpu, self_ram) = self.self_monitor.collect(&self.sys);
 

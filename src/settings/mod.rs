@@ -50,7 +50,10 @@ impl SettingsManager {
     /// Carrega as configurações do disco com fallback resiliente para valores padrão.
     pub fn load(&self) -> AppSettings {
         if !self.file_path.exists() {
-            info!("Arquivo de configurações não encontrado. Criando padrões em {:?}", self.file_path);
+            info!(
+                "Arquivo de configurações não encontrado. Criando padrões em {:?}",
+                self.file_path
+            );
             let default_settings = AppSettings::default();
             self.save(&default_settings);
             return default_settings;

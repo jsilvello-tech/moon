@@ -224,7 +224,13 @@ impl MoonMonitorApp {
     fn apply_snapshot_to_ui(ui: &MainWindow, snap: TelemetrySnapshot) {
         // 1. Identificação do Sistema
         ui.set_hostname(snap.system_info.host_name.into());
-        ui.set_os_version(format!("{} {}", snap.system_info.os_name, snap.system_info.os_version).into());
+        ui.set_os_version(
+            format!(
+                "{} {}",
+                snap.system_info.os_name, snap.system_info.os_version
+            )
+            .into(),
+        );
         ui.set_architecture(snap.system_info.architecture.into());
         ui.set_uptime(format_uptime(snap.system_info.uptime_seconds).into());
 

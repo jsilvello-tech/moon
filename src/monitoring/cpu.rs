@@ -62,7 +62,10 @@ impl CpuCollector {
             .iter()
             .find(|comp| {
                 let label = comp.label().to_lowercase();
-                label.contains("cpu") || label.contains("core") || label.contains("package") || label.contains("tctl")
+                label.contains("cpu")
+                    || label.contains("core")
+                    || label.contains("package")
+                    || label.contains("tctl")
             })
             .and_then(|comp| comp.temperature());
 

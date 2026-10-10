@@ -20,8 +20,14 @@ impl GpuCollector {
                 while let Ok(adapter) = factory.EnumAdapters1(index) {
                     if let Ok(desc) = adapter.GetDesc1() {
                         // Converte o nome UTF-16 do adaptador
-                        let name_len = desc.Description.iter().position(|&c| c == 0).unwrap_or(desc.Description.len());
-                        let name = String::from_utf16_lossy(&desc.Description[..name_len]).trim().to_string();
+                        let name_len = desc
+                            .Description
+                            .iter()
+                            .position(|&c| c == 0)
+                            .unwrap_or(desc.Description.len());
+                        let name = String::from_utf16_lossy(&desc.Description[..name_len])
+                            .trim()
+                            .to_string();
 
                         // Identifica fabricante pelo VendorId PCI
                         let vendor = match desc.VendorId {
@@ -61,6 +67,8 @@ impl GpuCollector {
 
     #[cfg(not(windows))]
     pub fn collect(&self) -> GpuMetrics {
-        GpuMetrics { adapters: Vec::new() }
+        GpuMetrics {
+            adapters: Vec::new(),
+        }
     }
 }

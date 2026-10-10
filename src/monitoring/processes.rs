@@ -53,13 +53,11 @@ impl ProcessesCollector {
             }
             ProcessSortOrder::MemoryDesc => {
                 list.sort_by(|a, b| {
-                    b.memory_bytes
-                        .cmp(&a.memory_bytes)
-                        .then_with(|| {
-                            b.cpu_usage_percent
-                                .partial_cmp(&a.cpu_usage_percent)
-                                .unwrap_or(std::cmp::Ordering::Equal)
-                        })
+                    b.memory_bytes.cmp(&a.memory_bytes).then_with(|| {
+                        b.cpu_usage_percent
+                            .partial_cmp(&a.cpu_usage_percent)
+                            .unwrap_or(std::cmp::Ordering::Equal)
+                    })
                 });
             }
         }

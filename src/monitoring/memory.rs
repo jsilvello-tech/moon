@@ -41,7 +41,12 @@ impl MemoryCollector {
             .map(|(pid, proc_info)| {
                 let mem = proc_info.memory();
                 let pct = calculate_percentage(mem, total);
-                (pid.as_u32(), proc_info.name().to_string_lossy().to_string(), mem, pct)
+                (
+                    pid.as_u32(),
+                    proc_info.name().to_string_lossy().to_string(),
+                    mem,
+                    pct,
+                )
             })
             .collect();
 
@@ -51,12 +56,14 @@ impl MemoryCollector {
         let top_consumers = process_list
             .into_iter()
             .take(5)
-            .map(|(pid, name, memory_bytes, memory_percent)| ProcessRamSummary {
-                pid,
-                name,
-                memory_bytes,
-                memory_percent,
-            })
+            .map(
+                |(pid, name, memory_bytes, memory_percent)| ProcessRamSummary {
+                    pid,
+                    name,
+                    memory_bytes,
+                    memory_percent,
+                },
+            )
             .collect();
 
         MemoryMetrics {
