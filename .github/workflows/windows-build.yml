@@ -26,7 +26,18 @@ jobs:
         run: cargo fmt --check
 
       - name: Run Cargo Check
-        run: cargo check --verbose
+        shell: pwsh
+        run: |
+          cargo check --verbose 2>&1 | Tee-Object -FilePath check.log
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "CARGO CHECK FAILED!"
+            $errs = Get-Content check.log | Select-String -Pattern "error\[", "error:" -Context 1, 3
+            foreach ($e in $errs) {
+              Write-Host "::error::$e"
+            }
+            Get-Content check.log -Tail 100
+            exit 1
+          }
 
       - name: Run Clippy Linter
         run: cargo clippy --all-targets
