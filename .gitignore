@@ -16,7 +16,8 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-# Moon Monitor user data & local scratch
+# Output archives & installer
+dist/*.zip
+installer/Output/
 *.log
 scratch/
-installer/Output/
