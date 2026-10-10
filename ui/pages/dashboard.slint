@@ -1,0 +1,388 @@
+import { Theme } from "../themes/palette.slint";
+import { MoonCard } from "../components/card.slint";
+import { MoonSparkline } from "../components/sparkline.slint";
+import { MoonProgressBar } from "../components/progress_bar.slint";
+import { LunarPhaseIndicator } from "../components/lunar_phase.slint";
+
+export struct StorageItem {
+    name: string,
+    mount_point: string,
+    fs_type: string,
+    total_gb: string,
+    used_gb: string,
+    free_gb: string,
+    usage_percent: float,
+}
+
+export component DashboardPage {
+    // System Info
+    in property <string> hostname: "Carregando...";
+    in property <string> os_version: "Windows 11";
+    in property <string> architecture: "x86_64";
+    in property <string> uptime: "0d 0h 0m";
+
+    // CPU Info
+    in property <string> cpu_name: "Detectando processador...";
+    in property <float> cpu_usage: 0.0;
+    in property <int> cpu_physical_cores: 0;
+    in property <int> cpu_logical_cores: 0;
+    in property <string> cpu_frequency: "Não disponível";
+    in property <[float]> cpu_history: [];
+
+    // RAM Info
+    in property <string> ram_total: "0 GiB";
+    in property <string> ram_used: "0 GiB";
+    in property <string> ram_available: "0 GiB";
+    in property <float> ram_usage_percent: 0.0;
+    in property <[float]> ram_history: [];
+
+    // GPU Info
+    in property <string> gpu_name: "Não disponível";
+    in property <string> gpu_usage: "Não disponível";
+    in property <string> gpu_vram: "Não disponível";
+    in property <string> gpu_temperature: "Não disponível";
+
+    // Storage Info
+    in property <[StorageItem]> storage_items: [];
+
+    Flickable {
+        viewport-height: 860px;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 20px;
+
+            // Top Status Bar: System Overview + Lunar Indicator
+            Rectangle {
+                background: Theme.surface;
+                border-radius: Theme.radius_md;
+                border-width: 1px;
+                border-color: Theme.border;
+                padding: 16px;
+
+                HorizontalLayout {
+                    alignment: space-between;
+
+                    // System Identity
+                    HorizontalLayout {
+                        spacing: 24px;
+                        alignment: start;
+
+                        VerticalLayout {
+                            spacing: 3px;
+                            Text {
+                                text: "DISPOSITIVO";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: root.hostname;
+                                font-size: 14px;
+                                font-weight: 700;
+                                color: Theme.moonlight_silver;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 3px;
+                            Text {
+                                text: "SISTEMA OPERACIONAL";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: root.os_version;
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: Theme.text_primary;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 3px;
+                            Text {
+                                text: "ARQUITETURA";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: root.architecture;
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: Theme.text_primary;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 3px;
+                            Text {
+                                text: "TEMPO DE ATIVIDADE";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: root.uptime;
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: Theme.orbit_green;
+                            }
+                        }
+                    }
+
+                    // Lunar Status Indicator
+                    LunarPhaseIndicator {
+                        cpu_usage: root.cpu_usage;
+                        show_label: true;
+                    }
+                }
+            }
+
+            // Grid of Primary Telemetry Cards (CPU & RAM)
+            HorizontalLayout {
+                spacing: 20px;
+
+                // CPU Card
+                MoonCard {
+                    horizontal-stretch: 1;
+                    title: "Lunar Core — Processador";
+                    subtitle: root.cpu_name;
+                    accent_color: Theme.lunar_violet;
+
+                    VerticalLayout {
+                        spacing: 12px;
+
+                        HorizontalLayout {
+                            alignment: space-between;
+
+                            VerticalLayout {
+                                spacing: 2px;
+                                Text {
+                                    text: "Utilização Total";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                                Text {
+                                    text: "\{Math.round(root.cpu_usage)}%";
+                                    font-size: 32px;
+                                    font-weight: 800;
+                                    color: Theme.lunar_violet;
+                                }
+                            }
+
+                            VerticalLayout {
+                                spacing: 4px;
+                                alignment: end;
+
+                                Text {
+                                    text: "Núcleos Físicos: \{root.cpu_physical_cores} | Lógicos: \{root.cpu_logical_cores}";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                                Text {
+                                    text: "Frequência: \{root.cpu_frequency}";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                            }
+                        }
+
+                        MoonProgressBar {
+                            progress: root.cpu_usage;
+                            auto_color: true;
+                            bar_height: 10px;
+                        }
+
+                        MoonSparkline {
+                            points: root.cpu_history;
+                            line_color: Theme.lunar_violet;
+                            current_val: root.cpu_usage;
+                            unit: "%";
+                        }
+                    }
+                }
+
+                // RAM Card
+                MoonCard {
+                    horizontal-stretch: 1;
+                    title: "Crystal Memory — Memória RAM";
+                    subtitle: "Alocação e disponibilidade";
+                    accent_color: Theme.crystal_cyan;
+
+                    VerticalLayout {
+                        spacing: 12px;
+
+                        HorizontalLayout {
+                            alignment: space-between;
+
+                            VerticalLayout {
+                                spacing: 2px;
+                                Text {
+                                    text: "Em Uso";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                                Text {
+                                    text: "\{Math.round(root.ram_usage_percent)}%";
+                                    font-size: 32px;
+                                    font-weight: 800;
+                                    color: Theme.crystal_cyan;
+                                }
+                            }
+
+                            VerticalLayout {
+                                spacing: 4px;
+                                alignment: end;
+
+                                Text {
+                                    text: "Utilizado: \{root.ram_used} de \{root.ram_total}";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                                Text {
+                                    text: "Disponível: \{root.ram_available}";
+                                    font-size: 11px;
+                                    color: Theme.orbit_green;
+                                }
+                            }
+                        }
+
+                        MoonProgressBar {
+                            progress: root.ram_usage_percent;
+                            fill_color: Theme.crystal_cyan;
+                            bar_height: 10px;
+                        }
+
+                        MoonSparkline {
+                            points: root.ram_history;
+                            line_color: Theme.crystal_cyan;
+                            current_val: root.ram_usage_percent;
+                            unit: "%";
+                        }
+                    }
+                }
+            }
+
+            // Secondary Row: GPU & Storage Overview
+            HorizontalLayout {
+                spacing: 20px;
+
+                // GPU Card
+                MoonCard {
+                    horizontal-stretch: 1;
+                    title: "Eclipse Graphics — GPU";
+                    subtitle: root.gpu_name;
+                    accent_color: Theme.solar_warning;
+
+                    VerticalLayout {
+                        spacing: 14px;
+
+                        HorizontalLayout {
+                            alignment: space-between;
+
+                            VerticalLayout {
+                                spacing: 2px;
+                                Text {
+                                    text: "Utilização";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                                Text {
+                                    text: root.gpu_usage;
+                                    font-size: 24px;
+                                    font-weight: 700;
+                                    color: Theme.solar_warning;
+                                }
+                            }
+
+                            VerticalLayout {
+                                spacing: 2px;
+                                Text {
+                                    text: "VRAM Dedicada";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                                Text {
+                                    text: root.gpu_vram;
+                                    font-size: 18px;
+                                    font-weight: 600;
+                                    color: Theme.text_primary;
+                                }
+                            }
+
+                            VerticalLayout {
+                                spacing: 2px;
+                                Text {
+                                    text: "Temperatura";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                                Text {
+                                    text: root.gpu_temperature;
+                                    font-size: 18px;
+                                    font-weight: 600;
+                                    color: Theme.text_primary;
+                                }
+                            }
+                        }
+
+                        Text {
+                            text: "Telemetria de adaptadores gráficos nativos via DXGI.";
+                            font-size: 11px;
+                            font-italic: true;
+                            color: Theme.text_muted;
+                        }
+                    }
+                }
+
+                // Storage Volumes Card
+                MoonCard {
+                    horizontal-stretch: 1;
+                    title: "Moon Storage — Armazenamento";
+                    subtitle: "Volumes e unidades montadas";
+                    accent_color: Theme.orbit_green;
+
+                    VerticalLayout {
+                        spacing: 12px;
+
+                        if root.storage_items.length == 0: Text {
+                            text: "Detectando discos...";
+                            font-size: 12px;
+                            color: Theme.text_muted;
+                        }
+
+                        for disk[idx] in root.storage_items: VerticalLayout {
+                            spacing: 4px;
+
+                            HorizontalLayout {
+                                alignment: space-between;
+
+                                Text {
+                                    text: "\{disk.mount_point} (\{disk.name != \"\" ? disk.name : \"Volume\"}) - \{disk.fs_type}";
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    color: Theme.text_primary;
+                                }
+
+                                Text {
+                                    text: "\{disk.used_gb} / \{disk.total_gb} (\{Math.round(disk.usage_percent)}%)";
+                                    font-size: 11px;
+                                    color: Theme.text_secondary;
+                                }
+                            }
+
+                            MoonProgressBar {
+                                progress: disk.usage_percent;
+                                fill_color: Theme.orbit_green;
+                                bar_height: 6px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

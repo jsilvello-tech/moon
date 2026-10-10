@@ -1,0 +1,339 @@
+import { Theme } from "../themes/palette.slint";
+import { MoonCard } from "../components/card.slint";
+import { MoonBadge } from "../components/badge.slint";
+
+export struct ProcessItem {
+    pid: int,
+    name: string,
+    cpu_percent: float,
+    cpu_formatted: string,
+    memory_formatted: string,
+    memory_bytes: int,
+}
+
+export component ProcessesPage {
+    in property <[ProcessItem]> processes: [];
+    in property <int> selected_pid: 0;
+    in property <string> selected_name: "";
+    in property <string> selected_cpu: "";
+    in property <string> selected_mem: "";
+    in property <int> total_process_count: 0;
+    in-out property <string> search_query: "";
+    in-out property <int> sort_by: 0; // 0 = CPU, 1 = Memória
+
+    callback search_changed(string);
+    callback sort_changed(int);
+    callback process_selected(int, string, string, string);
+
+    VerticalLayout {
+        padding: 24px;
+        spacing: 16px;
+
+        // Header Section
+        HorizontalLayout {
+            alignment: space-between;
+
+            VerticalLayout {
+                spacing: 4px;
+                Text {
+                    text: "ORBIT PROCESSES";
+                    font-size: 11px;
+                    font-weight: 800;
+                    letter-spacing: 1px;
+                    color: Theme.lunar_violet;
+                }
+                Text {
+                    text: "Processos Ativos no Sistema (Total: \{root.total_process_count})";
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: Theme.moonlight_silver;
+                }
+            }
+
+            // Read-only indicator pill
+            MoonBadge {
+                text: "Modo Somente Leitura";
+                bg_color: #1F2840;
+                text_color: Theme.lunar_violet;
+            }
+        }
+
+        // Toolbar: Search + Sort controls
+        Rectangle {
+            background: Theme.surface;
+            border-radius: Theme.radius_md;
+            border-width: 1px;
+            border-color: Theme.border;
+            padding: 12px;
+
+            HorizontalLayout {
+                spacing: 16px;
+                alignment: space-between;
+
+                // Search field
+                HorizontalLayout {
+                    spacing: 8px;
+                    width: 320px;
+
+                    Text {
+                        text: "🔍";
+                        font-size: 14px;
+                        vertical-alignment: center;
+                    }
+
+                    Rectangle {
+                        background: Theme.dark_mode ? #0C1222 : #F1F5F9;
+                        border-radius: Theme.radius_sm;
+                        border-width: 1px;
+                        border-color: Theme.border;
+                        horizontal-stretch: 1;
+                        height: 34px;
+
+                        search_input := TextInput {
+                            x: 8px;
+                            width: parent.width - 16px;
+                            vertical-alignment: center;
+                            text <=> root.search_query;
+                            color: Theme.text_primary;
+                            font-size: 13px;
+                            edited => { root.search_changed(self.text); }
+                        }
+
+                        if root.search_query == "": Text {
+                            x: 8px;
+                            vertical-alignment: center;
+                            text: "Filtrar por nome de processo...";
+                            color: Theme.text_muted;
+                            font-size: 13px;
+                        }
+                    }
+                }
+
+                // Sort By Buttons
+                HorizontalLayout {
+                    spacing: 8px;
+
+                    Text {
+                        text: "Ordenar por:";
+                        font-size: 12px;
+                        color: Theme.text_secondary;
+                        vertical-alignment: center;
+                    }
+
+                    // CPU Sort
+                    Rectangle {
+                        height: 32px;
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        border-radius: Theme.radius_sm;
+                        background: root.sort_by == 0 ? Theme.surface_active : Theme.surface_hover;
+                        border-width: 1px;
+                        border-color: root.sort_by == 0 ? Theme.lunar_violet : Theme.border;
+
+                        Text {
+                            text: "Uso de CPU";
+                            font-size: 12px;
+                            font-weight: root.sort_by == 0 ? 700 : 500;
+                            color: root.sort_by == 0 ? Theme.lunar_violet : Theme.text_primary;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+
+                        TouchArea {
+                            clicked => {
+                                root.sort_by = 0;
+                                root.sort_changed(0);
+                            }
+                        }
+                    }
+
+                    // Memory Sort
+                    Rectangle {
+                        height: 32px;
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        border-radius: Theme.radius_sm;
+                        background: root.sort_by == 1 ? Theme.surface_active : Theme.surface_hover;
+                        border-width: 1px;
+                        border-color: root.sort_by == 1 ? Theme.crystal_cyan : Theme.border;
+
+                        Text {
+                            text: "Uso de RAM";
+                            font-size: 12px;
+                            font-weight: root.sort_by == 1 ? 700 : 500;
+                            color: root.sort_by == 1 ? Theme.crystal_cyan : Theme.text_primary;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+
+                        TouchArea {
+                            clicked => {
+                                root.sort_by = 1;
+                                root.sort_changed(1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Selected Process Inspector bar (if a process is clicked)
+        if root.selected_pid > 0: Rectangle {
+            background: #17203A;
+            border-radius: Theme.radius_sm;
+            border-width: 1px;
+            border-color: Theme.crystal_cyan;
+            padding: 10px;
+
+            HorizontalLayout {
+                spacing: 24px;
+                alignment: start;
+
+                Text {
+                    text: "PROCESSO SELECIONADO: PID \{root.selected_pid} (\{root.selected_name})";
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: Theme.moonlight_silver;
+                }
+
+                Text {
+                    text: "CPU: \{root.selected_cpu}";
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: Theme.lunar_violet;
+                }
+
+                Text {
+                    text: "Memória: \{root.selected_mem}";
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: Theme.crystal_cyan;
+                }
+            }
+        }
+
+        // Table Header
+        Rectangle {
+            height: 32px;
+            background: Theme.dark_mode ? #0D1324 : #E2E8F0;
+            border-radius: Theme.radius_sm;
+
+            HorizontalLayout {
+                padding-left: 16px;
+                padding-right: 16px;
+                spacing: 12px;
+
+                Text {
+                    width: 90px;
+                    text: "PID";
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: Theme.text_secondary;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    horizontal-stretch: 1;
+                    text: "NOME DO PROCESSO";
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: Theme.text_secondary;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    width: 110px;
+                    text: "USO DE CPU";
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: Theme.text_secondary;
+                    horizontal-alignment: end;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    width: 120px;
+                    text: "MEMÓRIA RAM";
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: Theme.text_secondary;
+                    horizontal-alignment: end;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        // Processes List
+        Flickable {
+            vertical-stretch: 1;
+
+            VerticalLayout {
+                spacing: 2px;
+
+                if root.processes.length == 0: Text {
+                    text: "Nenhum processo correspondente ao filtro encontrado.";
+                    font-size: 13px;
+                    color: Theme.text_muted;
+                    horizontal-alignment: center;
+                    padding-top: 30px;
+                }
+
+                for item[idx] in root.processes: Rectangle {
+                    height: 36px;
+                    border-radius: 4px;
+                    background: root.selected_pid == item.pid ? #233054 : (row_touch.has-hover ? Theme.surface_hover : transparent);
+
+                    HorizontalLayout {
+                        padding-left: 16px;
+                        padding-right: 16px;
+                        spacing: 12px;
+
+                        Text {
+                            width: 90px;
+                            text: "\{item.pid}";
+                            font-size: 12px;
+                            color: Theme.text_muted;
+                            vertical-alignment: center;
+                        }
+
+                        Text {
+                            horizontal-stretch: 1;
+                            text: item.name;
+                            font-size: 13px;
+                            font-weight: 600;
+                            color: Theme.text_primary;
+                            overflow: elide;
+                            vertical-alignment: center;
+                        }
+
+                        Text {
+                            width: 110px;
+                            text: item.cpu_formatted;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: item.cpu_percent > 10.0 ? Theme.solar_warning : Theme.lunar_violet;
+                            horizontal-alignment: end;
+                            vertical-alignment: center;
+                        }
+
+                        Text {
+                            width: 120px;
+                            text: item.memory_formatted;
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: Theme.crystal_cyan;
+                            horizontal-alignment: end;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    row_touch := TouchArea {
+                        clicked => {
+                            root.process_selected(item.pid, item.name, item.cpu_formatted, item.memory_formatted);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

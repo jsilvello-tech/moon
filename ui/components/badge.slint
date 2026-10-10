@@ -1,0 +1,29 @@
+import { Theme } from "../themes/palette.slint";
+
+export component MoonBadge {
+    in property <string> text: "Normal";
+    in property <color> bg_color: #1A3038;
+    in property <color> text_color: Theme.crystal_cyan;
+
+    Rectangle {
+        background: root.bg_color;
+        border-radius: 99px;
+        border-width: 1px;
+        border-color: root.text_color.transparentize(60%);
+
+        HorizontalLayout {
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            alignment: center;
+
+            Text {
+                text: root.text;
+                color: root.text_color;
+                font-size: 11px;
+                font-weight: 600;
+            }
+        }
+    }
+}

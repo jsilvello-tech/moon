@@ -1,0 +1,31 @@
+export global Theme {
+    in-out property <bool> dark_mode: true;
+    in-out property <bool> animations_enabled: true;
+
+    // Backgrounds & Surfaces
+    out property <color> background: dark_mode ? #0B1020 : #F8FAFC;
+    out property <color> surface: dark_mode ? #141B30 : #FFFFFF;
+    out property <color> surface_hover: dark_mode ? #1B2440 : #F1F5F9;
+    out property <color> surface_active: dark_mode ? #222D50 : #E2E8F0;
+    out property <color> card_bg: dark_mode ? #141B30 : #FFFFFF;
+    out property <color> border: dark_mode ? #253052 : #CBD5E1;
+    out property <color> border_highlight: dark_mode ? #3A4C80 : #94A3B8;
+
+    // Typography
+    out property <color> text_primary: dark_mode ? #DDE5F3 : #0F172A;
+    out property <color> text_secondary: dark_mode ? #8E9DB8 : #64748B;
+    out property <color> text_muted: dark_mode ? #5A6A88 : #94A3B8;
+
+    // Lunar Brand Accents
+    out property <color> lunar_violet: #A78BFA;
+    out property <color> crystal_cyan: #67E8F9;
+    out property <color> orbit_green: #4ADE80;
+    out property <color> solar_warning: #FBBF24;
+    out property <color> eclipse_red: #FB7185;
+    out property <color> moonlight_silver: #DDE5F3;
+
+    // Dimensions
+    out property <length> radius_sm: 6px;
+    out property <length> radius_md: 10px;
+    out property <length> radius_lg: 14px;
+}

@@ -1,0 +1,96 @@
+import { Theme } from "../themes/palette.slint";
+
+export component MoonSparkline {
+    in property <[float]> points: [];
+    in property <color> line_color: Theme.crystal_cyan;
+    in property <string> title: "Histórico dos últimos 60 segundos";
+    in property <float> current_val: 0.0;
+    in property <string> unit: "%";
+
+    VerticalLayout {
+        spacing: 6px;
+
+        HorizontalLayout {
+            alignment: space-between;
+
+            Text {
+                text: root.title;
+                font-size: 11px;
+                color: Theme.text_secondary;
+            }
+
+            Text {
+                text: "\{Math.round(root.current_val)}\{root.unit}";
+                font-size: 11px;
+                font-weight: 700;
+                color: root.line_color;
+            }
+        }
+
+        Rectangle {
+            height: 72px;
+            background: Theme.dark_mode ? #0D1322 : #F1F5F9;
+            border-radius: Theme.radius_sm;
+            border-width: 1px;
+            border-color: Theme.border;
+            clip: true;
+
+            // Background Grid Lines
+            Rectangle {
+                y: parent.height * 0.25;
+                height: 1px;
+                width: parent.width;
+                background: Theme.border.transparentize(50%);
+            }
+            Rectangle {
+                y: parent.height * 0.50;
+                height: 1px;
+                width: parent.width;
+                background: Theme.border.transparentize(50%);
+            }
+            Rectangle {
+                y: parent.height * 0.75;
+                height: 1px;
+                width: parent.width;
+                background: Theme.border.transparentize(50%);
+            }
+
+            // Historical Data Bars
+            HorizontalLayout {
+                padding-left: 4px;
+                padding-right: 4px;
+                padding-top: 4px;
+                padding-bottom: 4px;
+                spacing: 2px;
+                alignment: stretch;
+
+                for val[idx] in root.points: Rectangle {
+                    horizontal-stretch: 1;
+                    height: parent.height;
+
+                    Rectangle {
+                        y: parent.height - self.height;
+                        width: parent.width;
+                        height: Math.max(2px, parent.height * (Math.min(100.0, Math.max(0.0, val)) / 100.0));
+                        background: root.line_color.transparentize(0.2);
+                        border-radius: 1px;
+
+                        animate height {
+                            duration: Theme.animations_enabled ? 150ms : 0ms;
+                            easing: ease-out;
+                        }
+                    }
+                }
+            }
+
+            // Zero State Placeholder if no points yet
+            if root.points.length == 0: Text {
+                text: "Aguardando amostras de telemetria...";
+                font-size: 11px;
+                color: Theme.text_muted;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+    }
+}

@@ -1,0 +1,233 @@
+import { Theme } from "themes/palette.slint";
+import { MoonSidebar } from "components/sidebar.slint";
+import { DashboardPage, StorageItem } from "pages/dashboard.slint";
+import { CpuPage, CoreUsage } from "pages/cpu_page.slint";
+import { MemoryPage, TopProcessRam } from "pages/memory_page.slint";
+import { GpuPage, GpuAdapterInfo } from "pages/gpu_page.slint";
+import { StoragePage } from "pages/storage_page.slint";
+import { ProcessesPage, ProcessItem } from "pages/processes_page.slint";
+import { SettingsPage } from "pages/settings_page.slint";
+
+export { StorageItem, CoreUsage, TopProcessRam, GpuAdapterInfo, ProcessItem }
+
+export component MainWindow inherits Window {
+    title: "Moon Monitor — Keep your system in orbit";
+    preferred-width: 1200px;
+    preferred-height: 760px;
+    min-width: 900px;
+    min-height: 600px;
+    background: Theme.background;
+    default-font-family: "Segoe UI, -apple-system, sans-serif";
+
+    // Navigation state
+    in-out property <int> active_page: 0;
+
+    // Settings & State properties
+    in-out property <bool> dark_mode: true;
+    in-out property <int> update_interval_secs: 2;
+    in-out property <bool> animations_enabled: true;
+    in-out property <bool> is_paused: false;
+    in property <string> app_version: "0.1.0";
+    in property <string> config_path: "";
+
+    // Self-monitoring telemetry
+    in property <string> self_cpu_usage: "0.0%";
+    in property <string> self_ram_usage: "0.0 MiB";
+
+    // System info
+    in property <string> hostname: "Carregando...";
+    in property <string> os_version: "Windows 11";
+    in property <string> architecture: "x86_64";
+    in property <string> uptime: "0d 0h 0m";
+
+    // CPU Telemetry
+    in property <string> cpu_name: "Detectando...";
+    in property <string> cpu_vendor: "Detectando...";
+    in property <float> cpu_usage: 0.0;
+    in property <int> cpu_physical_cores: 0;
+    in property <int> cpu_logical_cores: 0;
+    in property <string> cpu_frequency: "Não disponível";
+    in property <string> cpu_temperature: "Não disponível";
+    in property <[float]> cpu_history: [];
+    in property <[CoreUsage]> cpu_cores: [];
+
+    // RAM Telemetry
+    in property <string> ram_total: "0 GiB";
+    in property <string> ram_used: "0 GiB";
+    in property <string> ram_available: "0 GiB";
+    in property <string> ram_free: "0 GiB";
+    in property <float> ram_usage_percent: 0.0;
+    in property <string> swap_total: "0 GiB";
+    in property <string> swap_used: "0 GiB";
+    in property <float> swap_usage_percent: 0.0;
+    in property <[float]> ram_history: [];
+    in property <[TopProcessRam]> top_memory_processes: [];
+
+    // GPU Telemetry
+    in property <string> gpu_name: "Não disponível";
+    in property <string> gpu_usage: "Não disponível";
+    in property <string> gpu_vram: "Não disponível";
+    in property <string> gpu_temperature: "Não disponível";
+    in property <[GpuAdapterInfo]> gpu_adapters: [];
+    in property <bool> has_gpu_detected: false;
+
+    // Storage Telemetry
+    in property <[StorageItem]> storage_items: [];
+
+    // Processes Telemetry
+    in property <[ProcessItem]> processes: [];
+    in property <int> total_process_count: 0;
+    in property <int> selected_pid: 0;
+    in property <string> selected_proc_name: "";
+    in property <string> selected_proc_cpu: "";
+    in property <string> selected_proc_mem: "";
+    in-out property <string> search_query: "";
+    in-out property <int> sort_by: 0;
+
+    // Callbacks to Rust Backend
+    callback page_selected(int);
+    callback search_changed(string);
+    callback sort_changed(int);
+    callback process_selected(int, string, string, string);
+    callback toggle_theme();
+    callback set_interval(int);
+    callback toggle_animations();
+    callback toggle_pause();
+    callback restore_defaults();
+
+    HorizontalLayout {
+        // Lateral Navigation Sidebar
+        MoonSidebar {
+            active_page: root.active_page;
+            is_paused: root.is_paused;
+            page_selected(page) => {
+                root.active_page = page;
+                root.page_selected(page);
+            }
+        }
+
+        // Active Viewport Container
+        Rectangle {
+            horizontal-stretch: 1;
+            clip: true;
+
+            // Page 0: Moon Dashboard
+            if root.active_page == 0: DashboardPage {
+                hostname: root.hostname;
+                os_version: root.os_version;
+                architecture: root.architecture;
+                uptime: root.uptime;
+                cpu_name: root.cpu_name;
+                cpu_usage: root.cpu_usage;
+                cpu_physical_cores: root.cpu_physical_cores;
+                cpu_logical_cores: root.cpu_logical_cores;
+                cpu_frequency: root.cpu_frequency;
+                cpu_history: root.cpu_history;
+                ram_total: root.ram_total;
+                ram_used: root.ram_used;
+                ram_available: root.ram_available;
+                ram_usage_percent: root.ram_usage_percent;
+                ram_history: root.ram_history;
+                gpu_name: root.gpu_name;
+                gpu_usage: root.gpu_usage;
+                gpu_vram: root.gpu_vram;
+                gpu_temperature: root.gpu_temperature;
+                storage_items: root.storage_items;
+            }
+
+            // Page 1: Lunar Core (CPU)
+            if root.active_page == 1: CpuPage {
+                cpu_model: root.cpu_name;
+                cpu_vendor: root.cpu_vendor;
+                cpu_total_usage: root.cpu_usage;
+                cpu_physical_cores: root.cpu_physical_cores;
+                cpu_logical_cores: root.cpu_logical_cores;
+                cpu_frequency: root.cpu_frequency;
+                cpu_temperature: root.cpu_temperature;
+                cpu_history: root.cpu_history;
+                cores: root.cpu_cores;
+            }
+
+            // Page 2: Crystal Memory (RAM)
+            if root.active_page == 2: MemoryPage {
+                ram_total: root.ram_total;
+                ram_used: root.ram_used;
+                ram_available: root.ram_available;
+                ram_free: root.ram_free;
+                ram_usage_percent: root.ram_usage_percent;
+                swap_total: root.swap_total;
+                swap_used: root.swap_used;
+                swap_usage_percent: root.swap_usage_percent;
+                ram_history: root.ram_history;
+                top_memory_processes: root.top_memory_processes;
+            }
+
+            // Page 3: Eclipse Graphics (GPU)
+            if root.active_page == 3: GpuPage {
+                adapters: root.gpu_adapters;
+                has_gpu_detected: root.has_gpu_detected;
+            }
+
+            // Page 4: Moon Storage
+            if root.active_page == 4: StoragePage {
+                storage_items: root.storage_items;
+            }
+
+            // Page 5: Orbit Processes
+            if root.active_page == 5: ProcessesPage {
+                processes: root.processes;
+                total_process_count: root.total_process_count;
+                selected_pid: root.selected_pid;
+                selected_name: root.selected_proc_name;
+                selected_cpu: root.selected_proc_cpu;
+                selected_mem: root.selected_proc_mem;
+                search_query <=> root.search_query;
+                sort_by <=> root.sort_by;
+
+                search_changed(query) => { root.search_changed(query); }
+                sort_changed(sort_id) => { root.sort_changed(sort_id); }
+                process_selected(pid, name, cpu_txt, mem_txt) => {
+                    root.selected_pid = pid;
+                    root.selected_proc_name = name;
+                    root.selected_proc_cpu = cpu_txt;
+                    root.selected_proc_mem = mem_txt;
+                    root.process_selected(pid, name, cpu_txt, mem_txt);
+                }
+            }
+
+            // Page 6: Lunar Settings
+            if root.active_page == 6: SettingsPage {
+                dark_mode <=> root.dark_mode;
+                update_interval_secs <=> root.update_interval_secs;
+                animations_enabled <=> root.animations_enabled;
+                is_paused <=> root.is_paused;
+                app_version: root.app_version;
+                config_path: root.config_path;
+                self_cpu_usage: root.self_cpu_usage;
+                self_ram_usage: root.self_ram_usage;
+
+                toggle_theme => {
+                    Theme.dark_mode = !Theme.dark_mode;
+                    root.dark_mode = Theme.dark_mode;
+                    root.toggle_theme();
+                }
+                set_interval(secs) => {
+                    root.update_interval_secs = secs;
+                    root.set_interval(secs);
+                }
+                toggle_animations => {
+                    Theme.animations_enabled = !Theme.animations_enabled;
+                    root.animations_enabled = Theme.animations_enabled;
+                    root.toggle_animations();
+                }
+                toggle_pause => {
+                    root.is_paused = !root.is_paused;
+                    root.toggle_pause();
+                }
+                restore_defaults => {
+                    root.restore_defaults();
+                }
+            }
+        }
+    }
+}

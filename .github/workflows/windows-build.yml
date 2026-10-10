@@ -1,0 +1,66 @@
+name: Moon Monitor Windows Build & CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-package:
+    name: Build & Package MoonMonitor (Windows x64)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+
+      - name: Check Formatting
+        run: cargo fmt --check
+
+      - name: Run Cargo Check
+        run: cargo check
+
+      - name: Run Clippy Linter
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Run Automated Tests
+        run: cargo test --verbose
+
+      - name: Build Release Binary
+        run: cargo build --release
+
+      - name: Create Portable Distribution Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "dist/MoonMonitor-Portable"
+          Copy-Item "target/release/MoonMonitor.exe" "dist/MoonMonitor-Portable/"
+          Copy-Item "README.md" "dist/MoonMonitor-Portable/"
+          Copy-Item "LICENSE" "dist/MoonMonitor-Portable/"
+          New-Item -ItemType Directory -Force -Path "dist/MoonMonitor-Portable/assets/icons"
+          Copy-Item "assets/icons/icon.ico" "dist/MoonMonitor-Portable/assets/icons/"
+          Copy-Item "assets/icons/icon.svg" "dist/MoonMonitor-Portable/assets/icons/"
+          
+          # Compactar para distribuição portátil (.zip)
+          Compress-Archive -Path "dist/MoonMonitor-Portable/*" -DestinationPath "dist/MoonMonitor-Portable.zip" -Force
+          
+          Get-ChildItem -Path "dist" | Format-Table Name, Length, LastWriteTime
+
+      - name: Upload Portable Executable & ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: MoonMonitor-v0.1.0-Windows-x64-Portable
+          path: |
+            dist/MoonMonitor-Portable.zip
+            dist/MoonMonitor-Portable/MoonMonitor.exe
+            README.md
+            LICENSE
+          if-no-files-found: error
+          retention-days: 14

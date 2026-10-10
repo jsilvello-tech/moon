@@ -1,0 +1,362 @@
+import { Theme } from "../themes/palette.slint";
+
+struct NavItemData {
+    id: int,
+    icon: string,
+    title: string,
+}
+
+export component MoonSidebar {
+    in property <int> active_page: 0;
+    in property <bool> is_paused: false;
+    callback page_selected(int);
+
+    Rectangle {
+        width: 240px;
+        background: Theme.surface;
+        border-width: 0px;
+        border-color: Theme.border;
+
+        Rectangle {
+            x: parent.width - 1px;
+            width: 1px;
+            height: parent.height;
+            background: Theme.border;
+        }
+
+        VerticalLayout {
+            padding: 18px;
+            spacing: 16px;
+
+            // Brand Header
+            VerticalLayout {
+                spacing: 6px;
+
+                HorizontalLayout {
+                    spacing: 10px;
+                    alignment: start;
+
+                    // App mini-logo
+                    Rectangle {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 8px;
+                        background: #0B1020;
+                        border-width: 1px;
+                        border-color: Theme.crystal_cyan;
+
+                        Text {
+                            text: "🌙";
+                            font-size: 16px;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    VerticalLayout {
+                        alignment: center;
+                        spacing: 1px;
+
+                        Text {
+                            text: "MOON MONITOR";
+                            font-size: 14px;
+                            font-weight: 800;
+                            letter-spacing: 0.5px;
+                            color: Theme.moonlight_silver;
+                        }
+
+                        Text {
+                            text: "v0.1.0 • Windows";
+                            font-size: 10px;
+                            font-weight: 600;
+                            color: Theme.lunar_violet;
+                        }
+                    }
+                }
+
+                Text {
+                    text: "Keep your system in orbit.";
+                    font-size: 11px;
+                    font-italic: true;
+                    color: Theme.text_secondary;
+                }
+            }
+
+            Rectangle {
+                height: 1px;
+                background: Theme.border;
+            }
+
+            // Navigation Items
+            VerticalLayout {
+                spacing: 6px;
+
+                // 0: Moon Dashboard
+                Rectangle {
+                    height: 42px;
+                    border-radius: Theme.radius_sm;
+                    background: root.active_page == 0 ? Theme.surface_active : (item0_touch.has-hover ? Theme.surface_hover : transparent);
+                    border-width: root.active_page == 0 ? 1px : 0px;
+                    border-color: Theme.crystal_cyan.transparentize(60%);
+
+                    HorizontalLayout {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        spacing: 12px;
+                        alignment: start;
+
+                        Text {
+                            text: "🪐";
+                            font-size: 14px;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            text: "Moon Dashboard";
+                            font-size: 13px;
+                            font-weight: root.active_page == 0 ? 700 : 500;
+                            color: root.active_page == 0 ? Theme.crystal_cyan : Theme.text_primary;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    item0_touch := TouchArea {
+                        clicked => { root.page_selected(0); }
+                    }
+                }
+
+                // 1: Lunar Core (CPU)
+                Rectangle {
+                    height: 42px;
+                    border-radius: Theme.radius_sm;
+                    background: root.active_page == 1 ? Theme.surface_active : (item1_touch.has-hover ? Theme.surface_hover : transparent);
+                    border-width: root.active_page == 1 ? 1px : 0px;
+                    border-color: Theme.lunar_violet.transparentize(60%);
+
+                    HorizontalLayout {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        spacing: 12px;
+                        alignment: start;
+
+                        Text {
+                            text: "⚡";
+                            font-size: 14px;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            text: "Lunar Core (CPU)";
+                            font-size: 13px;
+                            font-weight: root.active_page == 1 ? 700 : 500;
+                            color: root.active_page == 1 ? Theme.lunar_violet : Theme.text_primary;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    item1_touch := TouchArea {
+                        clicked => { root.page_selected(1); }
+                    }
+                }
+
+                // 2: Crystal Memory (RAM)
+                Rectangle {
+                    height: 42px;
+                    border-radius: Theme.radius_sm;
+                    background: root.active_page == 2 ? Theme.surface_active : (item2_touch.has-hover ? Theme.surface_hover : transparent);
+                    border-width: root.active_page == 2 ? 1px : 0px;
+                    border-color: Theme.crystal_cyan.transparentize(60%);
+
+                    HorizontalLayout {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        spacing: 12px;
+                        alignment: start;
+
+                        Text {
+                            text: "💎";
+                            font-size: 14px;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            text: "Crystal Memory";
+                            font-size: 13px;
+                            font-weight: root.active_page == 2 ? 700 : 500;
+                            color: root.active_page == 2 ? Theme.crystal_cyan : Theme.text_primary;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    item2_touch := TouchArea {
+                        clicked => { root.page_selected(2); }
+                    }
+                }
+
+                // 3: Eclipse Graphics (GPU)
+                Rectangle {
+                    height: 42px;
+                    border-radius: Theme.radius_sm;
+                    background: root.active_page == 3 ? Theme.surface_active : (item3_touch.has-hover ? Theme.surface_hover : transparent);
+                    border-width: root.active_page == 3 ? 1px : 0px;
+                    border-color: Theme.solar_warning.transparentize(60%);
+
+                    HorizontalLayout {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        spacing: 12px;
+                        alignment: start;
+
+                        Text {
+                            text: "🎮";
+                            font-size: 14px;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            text: "Eclipse Graphics";
+                            font-size: 13px;
+                            font-weight: root.active_page == 3 ? 700 : 500;
+                            color: root.active_page == 3 ? Theme.solar_warning : Theme.text_primary;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    item3_touch := TouchArea {
+                        clicked => { root.page_selected(3); }
+                    }
+                }
+
+                // 4: Moon Storage
+                Rectangle {
+                    height: 42px;
+                    border-radius: Theme.radius_sm;
+                    background: root.active_page == 4 ? Theme.surface_active : (item4_touch.has-hover ? Theme.surface_hover : transparent);
+                    border-width: root.active_page == 4 ? 1px : 0px;
+                    border-color: Theme.orbit_green.transparentize(60%);
+
+                    HorizontalLayout {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        spacing: 12px;
+                        alignment: start;
+
+                        Text {
+                            text: "💾";
+                            font-size: 14px;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            text: "Moon Storage";
+                            font-size: 13px;
+                            font-weight: root.active_page == 4 ? 700 : 500;
+                            color: root.active_page == 4 ? Theme.orbit_green : Theme.text_primary;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    item4_touch := TouchArea {
+                        clicked => { root.page_selected(4); }
+                    }
+                }
+
+                // 5: Orbit Processes
+                Rectangle {
+                    height: 42px;
+                    border-radius: Theme.radius_sm;
+                    background: root.active_page == 5 ? Theme.surface_active : (item5_touch.has-hover ? Theme.surface_hover : transparent);
+                    border-width: root.active_page == 5 ? 1px : 0px;
+                    border-color: Theme.lunar_violet.transparentize(60%);
+
+                    HorizontalLayout {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        spacing: 12px;
+                        alignment: start;
+
+                        Text {
+                            text: "🚀";
+                            font-size: 14px;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            text: "Orbit Processes";
+                            font-size: 13px;
+                            font-weight: root.active_page == 5 ? 700 : 500;
+                            color: root.active_page == 5 ? Theme.lunar_violet : Theme.text_primary;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    item5_touch := TouchArea {
+                        clicked => { root.page_selected(5); }
+                    }
+                }
+
+                // 6: Lunar Settings
+                Rectangle {
+                    height: 42px;
+                    border-radius: Theme.radius_sm;
+                    background: root.active_page == 6 ? Theme.surface_active : (item6_touch.has-hover ? Theme.surface_hover : transparent);
+                    border-width: root.active_page == 6 ? 1px : 0px;
+                    border-color: Theme.border_highlight;
+
+                    HorizontalLayout {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                        spacing: 12px;
+                        alignment: start;
+
+                        Text {
+                            text: "⚙️";
+                            font-size: 14px;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            text: "Lunar Settings";
+                            font-size: 13px;
+                            font-weight: root.active_page == 6 ? 700 : 500;
+                            color: root.active_page == 6 ? Theme.moonlight_silver : Theme.text_primary;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    item6_touch := TouchArea {
+                        clicked => { root.page_selected(6); }
+                    }
+                }
+            }
+
+            // Spacer
+            Rectangle {
+                vertical-stretch: 1;
+            }
+
+            // Collection Status indicator at bottom of sidebar
+            Rectangle {
+                padding: 10px;
+                border-radius: Theme.radius_sm;
+                background: root.is_paused ? #331518 : #0B1C22;
+                border-width: 1px;
+                border-color: root.is_paused ? Theme.eclipse_red.transparentize(50%) : Theme.orbit_green.transparentize(50%);
+
+                HorizontalLayout {
+                    spacing: 8px;
+                    alignment: center;
+
+                    Rectangle {
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 4px;
+                        background: root.is_paused ? Theme.eclipse_red : Theme.orbit_green;
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: root.is_paused ? "COLETA PAUSADA" : "SISTEMA EM ÓRBITA";
+                        font-size: 10px;
+                        font-weight: 700;
+                        color: root.is_paused ? Theme.eclipse_red : Theme.orbit_green;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+    }
+}

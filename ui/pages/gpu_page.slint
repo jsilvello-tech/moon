@@ -1,0 +1,187 @@
+import { Theme } from "../themes/palette.slint";
+import { MoonCard } from "../components/card.slint";
+import { MoonProgressBar } from "../components/progress_bar.slint";
+
+export struct GpuAdapterInfo {
+    index: int,
+    name: string,
+    vendor: string,
+    dedicated_vram: string,
+    shared_vram: string,
+    utilization: string,
+    temperature: string,
+    clock: string,
+}
+
+export component GpuPage {
+    in property <[GpuAdapterInfo]> adapters: [];
+    in property <bool> has_gpu_detected: false;
+
+    Flickable {
+        viewport-height: 800px;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 20px;
+
+            // Header Section
+            VerticalLayout {
+                spacing: 4px;
+                Text {
+                    text: "ECLIPSE GRAPHICS";
+                    font-size: 11px;
+                    font-weight: 800;
+                    letter-spacing: 1px;
+                    color: Theme.solar_warning;
+                }
+                Text {
+                    text: "Processamento Gráfico e Adaptadores de Vídeo";
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: Theme.moonlight_silver;
+                }
+            }
+
+            // Description / Status Banner
+            Rectangle {
+                background: Theme.surface;
+                border-radius: Theme.radius_md;
+                border-width: 1px;
+                border-color: Theme.border;
+                padding: 16px;
+
+                HorizontalLayout {
+                    spacing: 16px;
+                    alignment: start;
+
+                    Text {
+                        text: "🎮";
+                        font-size: 24px;
+                        vertical-alignment: center;
+                    }
+
+                    VerticalLayout {
+                        spacing: 4px;
+                        Text {
+                            text: "Detecção Nativa via Windows DXGI (DirectX Graphics Infrastructure)";
+                            font-size: 13px;
+                            font-weight: 700;
+                            color: Theme.text_primary;
+                        }
+                        Text {
+                            text: "As métricas de adaptador são obtidas sem privilégios administrativos e sem ferramentas de terceiros. Métricas de telemetria específicas que dependem de bibliotecas proprietárias (NVML, AMD ADL, Intel) são reportadas com segurança como 'Não disponível' quando não expostas nativamente.";
+                            font-size: 11px;
+                            color: Theme.text_secondary;
+                        }
+                    }
+                }
+            }
+
+            if !root.has_gpu_detected: MoonCard {
+                title: "Nenhum Adaptador Gráfico Identificado";
+                subtitle: "Verifique o status do subsistema gráfico do Windows";
+                accent_color: Theme.solar_warning;
+
+                Text {
+                    text: "Não foi possível enumerar dispositivos gráficos no subsistema DXGI do Windows.";
+                    font-size: 13px;
+                    color: Theme.text_secondary;
+                }
+            }
+
+            for adapter[idx] in root.adapters: MoonCard {
+                title: "Adaptador #\{adapter.index}: \{adapter.name}";
+                subtitle: "Fabricante: \{adapter.vendor}";
+                accent_color: Theme.solar_warning;
+
+                VerticalLayout {
+                    spacing: 16px;
+
+                    HorizontalLayout {
+                        spacing: 24px;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "VRAM DEDICADA";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: adapter.dedicated_vram;
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: Theme.crystal_cyan;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "MEMÓRIA COMPARTILHADA";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: adapter.shared_vram;
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: Theme.text_primary;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "UTILIZAÇÃO";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: adapter.utilization;
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: adapter.utilization == "Não disponível" ? Theme.text_muted : Theme.solar_warning;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "TEMPERATURA";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: adapter.temperature;
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: adapter.temperature == "Não disponível" ? Theme.text_muted : Theme.eclipse_red;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "CLOCK / FREQUÊNCIA";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: adapter.clock;
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: adapter.clock == "Não disponível" ? Theme.text_muted : Theme.lunar_violet;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

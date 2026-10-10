@@ -1,0 +1,208 @@
+import { Theme } from "../themes/palette.slint";
+import { MoonCard } from "../components/card.slint";
+import { MoonSparkline } from "../components/sparkline.slint";
+import { MoonProgressBar } from "../components/progress_bar.slint";
+
+export struct TopProcessRam {
+    pid: int,
+    name: string,
+    memory_formatted: string,
+    memory_percent: float,
+}
+
+export component MemoryPage {
+    in property <string> ram_total: "0 GiB";
+    in property <string> ram_used: "0 GiB";
+    in property <string> ram_available: "0 GiB";
+    in property <string> ram_free: "0 GiB";
+    in property <float> ram_usage_percent: 0.0;
+    in property <string> swap_total: "0 GiB";
+    in property <string> swap_used: "0 GiB";
+    in property <float> swap_usage_percent: 0.0;
+    in property <[float]> ram_history: [];
+    in property <[TopProcessRam]> top_memory_processes: [];
+
+    Flickable {
+        viewport-height: 880px;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 20px;
+
+            // Header Section
+            VerticalLayout {
+                spacing: 4px;
+                Text {
+                    text: "CRYSTAL MEMORY";
+                    font-size: 11px;
+                    font-weight: 800;
+                    letter-spacing: 1px;
+                    color: Theme.crystal_cyan;
+                }
+                Text {
+                    text: "Monitoramento de Memória Física e Virtual";
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: Theme.moonlight_silver;
+                }
+            }
+
+            // Overview Metric Cards
+            HorizontalLayout {
+                spacing: 16px;
+
+                MoonCard {
+                    horizontal-stretch: 1;
+                    title: "Memória Total";
+                    subtitle: "Capacidade instalada (GiB)";
+                    accent_color: Theme.crystal_cyan;
+
+                    Text {
+                        text: root.ram_total;
+                        font-size: 24px;
+                        font-weight: 800;
+                        color: Theme.moonlight_silver;
+                    }
+                }
+
+                MoonCard {
+                    horizontal-stretch: 1;
+                    title: "Em Uso";
+                    subtitle: "Ocupada por processos e SO";
+                    accent_color: Theme.solar_warning;
+
+                    Text {
+                        text: root.ram_used;
+                        font-size: 24px;
+                        font-weight: 800;
+                        color: Theme.crystal_cyan;
+                    }
+                }
+
+                MoonCard {
+                    horizontal-stretch: 1;
+                    title: "Disponível";
+                    subtitle: "Livre para novas alocações";
+                    accent_color: Theme.orbit_green;
+
+                    Text {
+                        text: root.ram_available;
+                        font-size: 24px;
+                        font-weight: 800;
+                        color: Theme.orbit_green;
+                    }
+                }
+
+                MoonCard {
+                    horizontal-stretch: 1;
+                    title: "Arquivo de Paginação";
+                    subtitle: "Uso do Swap / Pagefile";
+                    accent_color: Theme.lunar_violet;
+
+                    Text {
+                        text: "\{root.swap_used} / \{root.swap_total}";
+                        font-size: 20px;
+                        font-weight: 700;
+                        color: Theme.lunar_violet;
+                    }
+                }
+            }
+
+            // Usage & Sparkline
+            MoonCard {
+                title: "Histórico de Alocação de RAM";
+                subtitle: "Comportamento da memória física nos últimos 60 segundos";
+                accent_color: Theme.crystal_cyan;
+
+                VerticalLayout {
+                    spacing: 14px;
+
+                    HorizontalLayout {
+                        alignment: space-between;
+
+                        Text {
+                            text: "Utilização Atual: \{Math.round(root.ram_usage_percent)}%";
+                            font-size: 16px;
+                            font-weight: 700;
+                            color: Theme.crystal_cyan;
+                        }
+
+                        Text {
+                            text: "* Unidades em GiB (1 GiB = 1024 MiB). Memória disponível inclui cache reaproveitável.";
+                            font-size: 11px;
+                            font-italic: true;
+                            color: Theme.text_muted;
+                        }
+                    }
+
+                    MoonProgressBar {
+                        progress: root.ram_usage_percent;
+                        fill_color: Theme.crystal_cyan;
+                        bar_height: 12px;
+                    }
+
+                    MoonSparkline {
+                        points: root.ram_history;
+                        line_color: Theme.crystal_cyan;
+                        current_val: root.ram_usage_percent;
+                        unit: "%";
+                    }
+                }
+            }
+
+            // Top Memory Consumers
+            MoonCard {
+                title: "Maiores Consumidores de Memória";
+                subtitle: "Processos que retêm maior volume de memória no momento";
+                accent_color: Theme.lunar_violet;
+
+                VerticalLayout {
+                    spacing: 10px;
+
+                    if root.top_memory_processes.length == 0: Text {
+                        text: "Coletando processos...";
+                        font-size: 12px;
+                        color: Theme.text_muted;
+                    }
+
+                    for p[idx] in root.top_memory_processes: HorizontalLayout {
+                        spacing: 16px;
+                        alignment: center;
+
+                        Text {
+                            width: 60px;
+                            text: "PID \{p.pid}";
+                            font-size: 11px;
+                            color: Theme.text_muted;
+                        }
+
+                        Text {
+                            width: 220px;
+                            text: p.name;
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: Theme.text_primary;
+                            overflow: elide;
+                        }
+
+                        MoonProgressBar {
+                            horizontal-stretch: 1;
+                            progress: p.memory_percent;
+                            fill_color: Theme.lunar_violet;
+                            bar_height: 8px;
+                        }
+
+                        Text {
+                            width: 100px;
+                            text: p.memory_formatted;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: Theme.crystal_cyan;
+                            horizontal-alignment: end;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

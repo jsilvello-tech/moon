@@ -1,0 +1,36 @@
+import { Theme } from "../themes/palette.slint";
+
+export component MoonProgressBar {
+    in property <float> progress: 0.0; // 0.0 to 100.0
+    in property <color> fill_color: Theme.crystal_cyan;
+    in property <bool> auto_color: false;
+    in property <length> bar_height: 8px;
+
+    property <float> clamped_progress: Math.max(0.0, Math.min(100.0, root.progress));
+    property <color> computed_color: root.auto_color ? (
+        clamped_progress >= 90.0 ? Theme.eclipse_red :
+        clamped_progress >= 70.0 ? Theme.solar_warning :
+        Theme.crystal_cyan
+    ) : root.fill_color;
+
+    Rectangle {
+        height: root.bar_height;
+        background: Theme.dark_mode ? #1E2945 : #E2E8F0;
+        border-radius: root.bar_height / 2;
+        clip: true;
+
+        Rectangle {
+            x: 0px;
+            y: 0px;
+            width: parent.width * (root.clamped_progress / 100.0);
+            height: parent.height;
+            background: root.computed_color;
+            border-radius: root.bar_height / 2;
+
+            animate width {
+                duration: Theme.animations_enabled ? 250ms : 0ms;
+                easing: ease-out;
+            }
+        }
+    }
+}

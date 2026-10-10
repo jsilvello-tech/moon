@@ -1,0 +1,261 @@
+import { Theme } from "../themes/palette.slint";
+import { MoonCard } from "../components/card.slint";
+import { MoonSparkline } from "../components/sparkline.slint";
+import { MoonProgressBar } from "../components/progress_bar.slint";
+import { LunarPhaseIndicator } from "../components/lunar_phase.slint";
+
+export struct CoreUsage {
+    core_index: int,
+    usage: float,
+    frequency_mhz: int,
+}
+
+export component CpuPage {
+    in property <string> cpu_model: "Detectando...";
+    in property <string> cpu_vendor: "Detectando...";
+    in property <float> cpu_total_usage: 0.0;
+    in property <int> cpu_physical_cores: 0;
+    in property <int> cpu_logical_cores: 0;
+    in property <string> cpu_frequency: "Não disponível";
+    in property <string> cpu_temperature: "Não disponível";
+    in property <[float]> cpu_history: [];
+    in property <[CoreUsage]> cores: [];
+
+    Flickable {
+        viewport-height: 900px;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 20px;
+
+            // Header Section
+            HorizontalLayout {
+                alignment: space-between;
+
+                VerticalLayout {
+                    spacing: 4px;
+                    Text {
+                        text: "LUNAR CORE";
+                        font-size: 11px;
+                        font-weight: 800;
+                        letter-spacing: 1px;
+                        color: Theme.lunar_violet;
+                    }
+                    Text {
+                        text: "Telemetria Detalhada do Processador";
+                        font-size: 20px;
+                        font-weight: 700;
+                        color: Theme.moonlight_silver;
+                    }
+                }
+
+                LunarPhaseIndicator {
+                    cpu_usage: root.cpu_total_usage;
+                    show_label: true;
+                }
+            }
+
+            // Specs Card
+            MoonCard {
+                title: "Identificação e Especificações";
+                subtitle: "Arquitetura e topologia do hardware";
+                accent_color: Theme.lunar_violet;
+
+                HorizontalLayout {
+                    spacing: 24px;
+
+                    VerticalLayout {
+                        spacing: 2px;
+                        Text {
+                            text: "MODELO";
+                            font-size: 10px;
+                            font-weight: 700;
+                            color: Theme.text_muted;
+                        }
+                        Text {
+                            text: root.cpu_model;
+                            font-size: 14px;
+                            font-weight: 600;
+                            color: Theme.text_primary;
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: 2px;
+                        Text {
+                            text: "FABRICANTE";
+                            font-size: 10px;
+                            font-weight: 700;
+                            color: Theme.text_muted;
+                        }
+                        Text {
+                            text: root.cpu_vendor;
+                            font-size: 14px;
+                            font-weight: 600;
+                            color: Theme.text_primary;
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: 2px;
+                        Text {
+                            text: "NÚCLEOS FÍSICOS";
+                            font-size: 10px;
+                            font-weight: 700;
+                            color: Theme.text_muted;
+                        }
+                        Text {
+                            text: "\{root.cpu_physical_cores}";
+                            font-size: 14px;
+                            font-weight: 600;
+                            color: Theme.text_primary;
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: 2px;
+                        Text {
+                            text: "THREADS LÓGICAS";
+                            font-size: 10px;
+                            font-weight: 700;
+                            color: Theme.text_muted;
+                        }
+                        Text {
+                            text: "\{root.cpu_logical_cores}";
+                            font-size: 14px;
+                            font-weight: 600;
+                            color: Theme.text_primary;
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: 2px;
+                        Text {
+                            text: "FREQUÊNCIA";
+                            font-size: 10px;
+                            font-weight: 700;
+                            color: Theme.text_muted;
+                        }
+                        Text {
+                            text: root.cpu_frequency;
+                            font-size: 14px;
+                            font-weight: 600;
+                            color: Theme.text_primary;
+                        }
+                    }
+
+                    VerticalLayout {
+                        spacing: 2px;
+                        Text {
+                            text: "TEMPERATURA";
+                            font-size: 10px;
+                            font-weight: 700;
+                            color: Theme.text_muted;
+                        }
+                        Text {
+                            text: root.cpu_temperature;
+                            font-size: 14px;
+                            font-weight: 600;
+                            color: root.cpu_temperature == "Não disponível" ? Theme.text_muted : Theme.solar_warning;
+                        }
+                    }
+                }
+            }
+
+            // Total Load & 60s Sparkline
+            MoonCard {
+                title: "Histórico de Utilização Total";
+                subtitle: "Consumo agregado de todos os núcleos";
+                accent_color: Theme.lunar_violet;
+
+                VerticalLayout {
+                    spacing: 12px;
+
+                    HorizontalLayout {
+                        alignment: space-between;
+
+                        Text {
+                            text: "Utilização Atual: \{Math.round(root.cpu_total_usage)}%";
+                            font-size: 16px;
+                            font-weight: 700;
+                            color: Theme.lunar_violet;
+                        }
+
+                        Text {
+                            text: "Amostragem em tempo real (intervalo de atualização)";
+                            font-size: 11px;
+                            color: Theme.text_secondary;
+                        }
+                    }
+
+                    MoonProgressBar {
+                        progress: root.cpu_total_usage;
+                        auto_color: true;
+                        bar_height: 12px;
+                    }
+
+                    MoonSparkline {
+                        points: root.cpu_history;
+                        line_color: Theme.lunar_violet;
+                        current_val: root.cpu_total_usage;
+                        unit: "%";
+                    }
+                }
+            }
+
+            // Per-Core Breakdown Card
+            MoonCard {
+                title: "Utilização por Núcleo Lógico";
+                subtitle: "Distribuição instantânea de processamento em cada thread";
+                accent_color: Theme.crystal_cyan;
+
+                VerticalLayout {
+                    spacing: 10px;
+
+                    if root.cores.length == 0: Text {
+                        text: "Aguardando leitura dos núcleos...";
+                        font-size: 12px;
+                        color: Theme.text_muted;
+                    }
+
+                    for core[idx] in root.cores: HorizontalLayout {
+                        spacing: 16px;
+                        alignment: center;
+
+                        Text {
+                            width: 80px;
+                            text: "Núcleo #\{core.core_index}";
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: Theme.text_primary;
+                        }
+
+                        MoonProgressBar {
+                            horizontal-stretch: 1;
+                            progress: core.usage;
+                            auto_color: true;
+                            bar_height: 8px;
+                        }
+
+                        Text {
+                            width: 50px;
+                            text: "\{Math.round(core.usage)}%";
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: Theme.lunar_violet;
+                            horizontal-alignment: end;
+                        }
+
+                        if core.frequency_mhz > 0: Text {
+                            width: 70px;
+                            text: "\{core.frequency_mhz} MHz";
+                            font-size: 11px;
+                            color: Theme.text_secondary;
+                            horizontal-alignment: end;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

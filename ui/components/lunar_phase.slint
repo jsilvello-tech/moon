@@ -1,0 +1,107 @@
+import { Theme } from "../themes/palette.slint";
+
+export component LunarPhaseIndicator {
+    in property <float> cpu_usage: 0.0;
+    in property <bool> show_label: true;
+
+    property <int> phase_type: (
+        root.cpu_usage >= 90.0 ? 3 :
+        root.cpu_usage >= 70.0 ? 2 :
+        root.cpu_usage >= 30.0 ? 1 : 0
+    );
+
+    property <string> phase_name: (
+        root.phase_type == 3 ? "Eclipse (Carga Crítica)" :
+        root.phase_type == 2 ? "Lua Cheia (Carga Elevada)" :
+        root.phase_type == 1 ? "Lua Gibosa (Carga Moderada)" :
+        "Lua Crescente (Carga Leve)"
+    );
+
+    property <color> phase_color: (
+        root.phase_type == 3 ? Theme.eclipse_red :
+        root.phase_type == 2 ? Theme.solar_warning :
+        root.phase_type == 1 ? Theme.crystal_cyan :
+        Theme.orbit_green
+    );
+
+    HorizontalLayout {
+        spacing: 12px;
+        alignment: start;
+
+        // Vector representation of moon phase
+        Rectangle {
+            width: 36px;
+            height: 36px;
+            background: Theme.dark_mode ? #0E1528 : #E2E8F0;
+            border-radius: 18px;
+            border-width: 1px;
+            border-color: root.phase_color.transparentize(50%);
+            clip: true;
+
+            // Base Moon sphere
+            Rectangle {
+                x: 4px;
+                y: 4px;
+                width: 28px;
+                height: 28px;
+                border-radius: 14px;
+                background: root.phase_type == 3 ? #201015 : #253356;
+                clip: true;
+
+                // Crescent / Gibous / Full moon mask simulation
+                if root.phase_type == 0: Rectangle { // Crescent
+                    x: 10px;
+                    y: 0px;
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 14px;
+                    background: root.phase_color;
+                }
+                if root.phase_type == 1: Rectangle { // Gibbous
+                    x: 6px;
+                    y: 0px;
+                    width: 24px;
+                    height: 28px;
+                    border-radius: 14px;
+                    background: root.phase_color;
+                }
+                if root.phase_type == 2: Rectangle { // Full moon
+                    x: 0px;
+                    y: 0px;
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 14px;
+                    background: root.phase_color;
+                }
+                if root.phase_type == 3: Rectangle { // Eclipse
+                    x: 0px;
+                    y: 0px;
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 14px;
+                    background: #10080B;
+                    border-width: 2px;
+                    border-color: root.phase_color;
+                }
+            }
+        }
+
+        if root.show_label: VerticalLayout {
+            alignment: center;
+            spacing: 2px;
+
+            Text {
+                text: "ESTADO LUNAR";
+                font-size: 10px;
+                font-weight: 700;
+                color: Theme.text_secondary;
+            }
+            Text {
+                text: root.phase_name;
+                font-size: 13px;
+                font-weight: 600;
+                color: root.phase_color;
+            }
+        }
+    }
+}

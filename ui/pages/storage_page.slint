@@ -1,0 +1,166 @@
+import { Theme } from "../themes/palette.slint";
+import { MoonCard } from "../components/card.slint";
+import { MoonProgressBar } from "../components/progress_bar.slint";
+import { StorageItem } from "./dashboard.slint";
+
+export component StoragePage {
+    in property <[StorageItem]> storage_items: [];
+
+    Flickable {
+        viewport-height: 800px;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 20px;
+
+            // Header Section
+            VerticalLayout {
+                spacing: 4px;
+                Text {
+                    text: "MOON STORAGE";
+                    font-size: 11px;
+                    font-weight: 800;
+                    letter-spacing: 1px;
+                    color: Theme.orbit_green;
+                }
+                Text {
+                    text: "Unidades de Armazenamento e Partições";
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: Theme.moonlight_silver;
+                }
+            }
+
+            // Info note
+            Rectangle {
+                background: Theme.surface;
+                border-radius: Theme.radius_md;
+                border-width: 1px;
+                border-color: Theme.border;
+                padding: 14px;
+
+                HorizontalLayout {
+                    spacing: 12px;
+                    alignment: start;
+
+                    Text {
+                        text: "💡";
+                        font-size: 18px;
+                        vertical-alignment: center;
+                    }
+
+                    VerticalLayout {
+                        spacing: 2px;
+                        Text {
+                            text: "Monitoramento Não-Invasivo de Capacidade";
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: Theme.text_primary;
+                        }
+                        Text {
+                            text: "As informações de capacidade são obtidas sem realizar operações de escrita ou testes de estresse que possam desgastar o hardware SSD/HDD.";
+                            font-size: 11px;
+                            color: Theme.text_secondary;
+                        }
+                    }
+                }
+            }
+
+            if root.storage_items.length == 0: MoonCard {
+                title: "Nenhum Volume Detectado";
+                subtitle: "Aguardando varredura de discos";
+                accent_color: Theme.orbit_green;
+
+                Text {
+                    text: "Procurando partições montadas no sistema...";
+                    font-size: 13px;
+                    color: Theme.text_muted;
+                }
+            }
+
+            for disk[idx] in root.storage_items: MoonCard {
+                title: "\{disk.mount_point} — \{disk.name != \"\" ? disk.name : \"Volume do Sistema\"}";
+                subtitle: "Sistema de Arquivos: \{disk.fs_type}";
+                accent_color: Theme.orbit_green;
+
+                VerticalLayout {
+                    spacing: 14px;
+
+                    HorizontalLayout {
+                        spacing: 24px;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "CAPACIDADE TOTAL";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: disk.total_gb;
+                                font-size: 16px;
+                                font-weight: 700;
+                                color: Theme.text_primary;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "ESPAÇO UTILIZADO";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: disk.used_gb;
+                                font-size: 16px;
+                                font-weight: 700;
+                                color: Theme.crystal_cyan;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "ESPAÇO LIVRE";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: disk.free_gb;
+                                font-size: 16px;
+                                font-weight: 700;
+                                color: Theme.orbit_green;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "OCUPAÇÃO";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: "\{Math.round(disk.usage_percent)}%";
+                                font-size: 16px;
+                                font-weight: 700;
+                                color: disk.usage_percent >= 90.0 ? Theme.eclipse_red : disk.usage_percent >= 75.0 ? Theme.solar_warning : Theme.orbit_green;
+                            }
+                        }
+                    }
+
+                    MoonProgressBar {
+                        progress: disk.usage_percent;
+                        auto_color: true;
+                        bar_height: 10px;
+                    }
+                }
+            }
+        }
+    }
+}

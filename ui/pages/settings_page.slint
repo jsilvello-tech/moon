@@ -1,0 +1,390 @@
+import { Theme } from "../themes/palette.slint";
+import { MoonCard } from "../components/card.slint";
+import { MoonBadge } from "../components/badge.slint";
+
+export component SettingsPage {
+    in-out property <bool> dark_mode: true;
+    in-out property <int> update_interval_secs: 2;
+    in-out property <bool> animations_enabled: true;
+    in-out property <bool> is_paused: false;
+
+    // Self-monitoring telemetry of Moon Monitor itself
+    in property <string> self_cpu_usage: "0.0%";
+    in property <string> self_ram_usage: "0.0 MiB";
+    in property <string> app_version: "0.1.0";
+    in property <string> config_path: "";
+
+    callback toggle_theme();
+    callback set_interval(int);
+    callback toggle_animations();
+    callback toggle_pause();
+    callback restore_defaults();
+
+    Flickable {
+        viewport-height: 850px;
+
+        VerticalLayout {
+            padding: 24px;
+            spacing: 20px;
+
+            // Header Section
+            VerticalLayout {
+                spacing: 4px;
+                Text {
+                    text: "LUNAR SETTINGS";
+                    font-size: 11px;
+                    font-weight: 800;
+                    letter-spacing: 1px;
+                    color: Theme.moonlight_silver;
+                }
+                Text {
+                    text: "Preferências e Diagnóstico do Aplicativo";
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: Theme.moonlight_silver;
+                }
+            }
+
+            // General Settings Card
+            MoonCard {
+                title: "Preferências de Monitoramento e Interface";
+                subtitle: "Personalize taxa de atualização e comportamento visual";
+                accent_color: Theme.crystal_cyan;
+
+                VerticalLayout {
+                    spacing: 18px;
+
+                    // Monitoring State (Pause/Resume)
+                    HorizontalLayout {
+                        alignment: space-between;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "Estado da Coleta de Telemetria";
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: Theme.text_primary;
+                            }
+                            Text {
+                                text: "Pausa temporariamente a leitura de sensores em segundo plano";
+                                font-size: 11px;
+                                color: Theme.text_secondary;
+                            }
+                        }
+
+                        Rectangle {
+                            height: 34px;
+                            padding-left: 16px;
+                            padding-right: 16px;
+                            border-radius: Theme.radius_sm;
+                            background: root.is_paused ? Theme.eclipse_red : Theme.orbit_green;
+
+                            Text {
+                                text: root.is_paused ? "▶ Retomar Coleta" : "⏸ Pausar Coleta";
+                                font-size: 12px;
+                                font-weight: 700;
+                                color: #0B1020;
+                                vertical-alignment: center;
+                                horizontal-alignment: center;
+                            }
+
+                            TouchArea {
+                                clicked => { root.toggle_pause(); }
+                            }
+                        }
+                    }
+
+                    Rectangle { height: 1px; background: Theme.border; }
+
+                    // Interval Selection
+                    HorizontalLayout {
+                        alignment: space-between;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "Intervalo de Amostragem";
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: Theme.text_primary;
+                            }
+                            Text {
+                                text: "Frequência de atualização dos sensores (Padrão: 2 segundos)";
+                                font-size: 11px;
+                                color: Theme.text_secondary;
+                            }
+                        }
+
+                        HorizontalLayout {
+                            spacing: 8px;
+
+                            // 1s
+                            Rectangle {
+                                width: 50px;
+                                height: 32px;
+                                border-radius: Theme.radius_sm;
+                                background: root.update_interval_secs == 1 ? Theme.surface_active : Theme.surface_hover;
+                                border-width: 1px;
+                                border-color: root.update_interval_secs == 1 ? Theme.crystal_cyan : Theme.border;
+
+                                Text {
+                                    text: "1s";
+                                    font-size: 12px;
+                                    font-weight: 700;
+                                    color: root.update_interval_secs == 1 ? Theme.crystal_cyan : Theme.text_primary;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+
+                                TouchArea { clicked => { root.set_interval(1); } }
+                            }
+
+                            // 2s (Default)
+                            Rectangle {
+                                width: 50px;
+                                height: 32px;
+                                border-radius: Theme.radius_sm;
+                                background: root.update_interval_secs == 2 ? Theme.surface_active : Theme.surface_hover;
+                                border-width: 1px;
+                                border-color: root.update_interval_secs == 2 ? Theme.crystal_cyan : Theme.border;
+
+                                Text {
+                                    text: "2s";
+                                    font-size: 12px;
+                                    font-weight: 700;
+                                    color: root.update_interval_secs == 2 ? Theme.crystal_cyan : Theme.text_primary;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+
+                                TouchArea { clicked => { root.set_interval(2); } }
+                            }
+
+                            // 5s
+                            Rectangle {
+                                width: 50px;
+                                height: 32px;
+                                border-radius: Theme.radius_sm;
+                                background: root.update_interval_secs == 5 ? Theme.surface_active : Theme.surface_hover;
+                                border-width: 1px;
+                                border-color: root.update_interval_secs == 5 ? Theme.crystal_cyan : Theme.border;
+
+                                Text {
+                                    text: "5s";
+                                    font-size: 12px;
+                                    font-weight: 700;
+                                    color: root.update_interval_secs == 5 ? Theme.crystal_cyan : Theme.text_primary;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+
+                                TouchArea { clicked => { root.set_interval(5); } }
+                            }
+                        }
+                    }
+
+                    Rectangle { height: 1px; background: Theme.border; }
+
+                    // Dark / Light Theme
+                    HorizontalLayout {
+                        alignment: space-between;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "Tema da Interface";
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: Theme.text_primary;
+                            }
+                            Text {
+                                text: "Alternar entre tema escuro lunar e tema claro solar";
+                                font-size: 11px;
+                                color: Theme.text_secondary;
+                            }
+                        }
+
+                        Rectangle {
+                            height: 32px;
+                            padding-left: 16px;
+                            padding-right: 16px;
+                            border-radius: Theme.radius_sm;
+                            background: Theme.surface_hover;
+                            border-width: 1px;
+                            border-color: Theme.border;
+
+                            Text {
+                                text: root.dark_mode ? "🌙 Tema Escuro (Ativo)" : "☀️ Tema Claro (Ativo)";
+                                font-size: 12px;
+                                font-weight: 600;
+                                color: Theme.text_primary;
+                                vertical-alignment: center;
+                                horizontal-alignment: center;
+                            }
+
+                            TouchArea { clicked => { root.toggle_theme(); } }
+                        }
+                    }
+
+                    Rectangle { height: 1px; background: Theme.border; }
+
+                    // Animations Toggle
+                    HorizontalLayout {
+                        alignment: space-between;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "Microanimações Fluidas";
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: Theme.text_primary;
+                            }
+                            Text {
+                                text: "Transições e animações de barras (desative para menor uso de GPU)";
+                                font-size: 11px;
+                                color: Theme.text_secondary;
+                            }
+                        }
+
+                        Rectangle {
+                            height: 32px;
+                            padding-left: 16px;
+                            padding-right: 16px;
+                            border-radius: Theme.radius_sm;
+                            background: Theme.surface_hover;
+                            border-width: 1px;
+                            border-color: Theme.border;
+
+                            Text {
+                                text: root.animations_enabled ? "✓ Ativadas" : "✗ Desativadas";
+                                font-size: 12px;
+                                font-weight: 600;
+                                color: root.animations_enabled ? Theme.orbit_green : Theme.text_secondary;
+                                vertical-alignment: center;
+                                horizontal-alignment: center;
+                            }
+
+                            TouchArea { clicked => { root.toggle_animations(); } }
+                        }
+                    }
+                }
+            }
+
+            // Self-Monitoring & Performance Benchmarking Card
+            MoonCard {
+                title: "Diagnóstico de Desempenho do Moon Monitor";
+                subtitle: "Telemetria do próprio processo para auditoria de eficiência";
+                accent_color: Theme.lunar_violet;
+
+                VerticalLayout {
+                    spacing: 12px;
+
+                    HorizontalLayout {
+                        spacing: 24px;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "CONSUMO DE CPU PRÓPRIO";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: root.self_cpu_usage;
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: Theme.lunar_violet;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "CONSUMO DE RAM PRÓPRIO";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: root.self_ram_usage;
+                                font-size: 18px;
+                                font-weight: 700;
+                                color: Theme.crystal_cyan;
+                            }
+                        }
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "ARQUIVO DE CONFIGURAÇÃO";
+                                font-size: 10px;
+                                font-weight: 700;
+                                color: Theme.text_muted;
+                            }
+                            Text {
+                                text: root.config_path;
+                                font-size: 12px;
+                                font-weight: 500;
+                                color: Theme.text_secondary;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // About & Restore Defaults
+            MoonCard {
+                title: "Sobre o Moon Monitor";
+                subtitle: "Keep your system in orbit.";
+                accent_color: Theme.moonlight_silver;
+
+                VerticalLayout {
+                    spacing: 12px;
+
+                    HorizontalLayout {
+                        alignment: space-between;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "Versão: \{root.app_version} (Edição Experimental Open-Source)";
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: Theme.text_primary;
+                            }
+                            Text {
+                                text: "Desenvolvido em Rust Nativo + Slint GUI para Windows 10 e 11.";
+                                font-size: 12px;
+                                color: Theme.text_secondary;
+                            }
+                        }
+
+                        Rectangle {
+                            height: 32px;
+                            padding-left: 14px;
+                            padding-right: 14px;
+                            border-radius: Theme.radius_sm;
+                            background: Theme.surface_hover;
+                            border-width: 1px;
+                            border-color: Theme.border;
+
+                            Text {
+                                text: "↺ Restaurar Padrões";
+                                font-size: 12px;
+                                font-weight: 600;
+                                color: Theme.solar_warning;
+                                vertical-alignment: center;
+                                horizontal-alignment: center;
+                            }
+
+                            TouchArea { clicked => { root.restore_defaults(); } }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
