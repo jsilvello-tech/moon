@@ -2,6 +2,7 @@ import { Theme } from "../themes/palette.slint";
 import { MoonCard } from "../components/card.slint";
 import { MoonSparkline } from "../components/sparkline.slint";
 import { MoonProgressBar } from "../components/progress_bar.slint";
+import { ScrollView } from "std-widgets.slint";
 
 import { TopProcessRam } from "../models.slint";
 
@@ -17,9 +18,7 @@ export component MemoryPage {
     in property <[float]> ram_history: [];
     in property <[TopProcessRam]> top_memory_processes: [];
 
-    Flickable {
-        viewport-height: 880px;
-
+    ScrollView {
         VerticalLayout {
             padding: 24px;
             spacing: 20px;

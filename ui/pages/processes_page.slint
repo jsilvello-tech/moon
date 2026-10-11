@@ -1,6 +1,7 @@
 import { Theme } from "../themes/palette.slint";
 import { MoonCard } from "../components/card.slint";
 import { MoonBadge } from "../components/badge.slint";
+import { ScrollView } from "std-widgets.slint";
 
 import { ProcessItem } from "../models.slint";
 
@@ -57,9 +58,9 @@ export component ProcessesPage {
             border-radius: Theme.radius_md;
             border-width: 1px;
             border-color: Theme.border;
-            padding: 12px;
 
             HorizontalLayout {
+                padding: 12px;
                 spacing: 16px;
                 alignment: space-between;
 
@@ -176,9 +177,9 @@ export component ProcessesPage {
             border-radius: Theme.radius_sm;
             border-width: 1px;
             border-color: Theme.crystal_cyan;
-            padding: 10px;
 
             HorizontalLayout {
+                padding: 10px;
                 spacing: 24px;
                 alignment: start;
 
@@ -213,7 +214,7 @@ export component ProcessesPage {
 
             HorizontalLayout {
                 padding-left: 16px;
-                padding-right: 16px;
+                padding-right: 28px;
                 spacing: 12px;
 
                 Text {
@@ -257,11 +258,13 @@ export component ProcessesPage {
         }
 
         // Processes List
-        Flickable {
+        ScrollView {
             vertical-stretch: 1;
 
             VerticalLayout {
+                padding-right: 8px;
                 spacing: 2px;
+                min-height: root.processes.length > 0 ? (root.processes.length * 38px) : 120px;
 
                 if root.processes.length == 0: Text {
                     text: "Nenhum processo correspondente ao filtro encontrado.";

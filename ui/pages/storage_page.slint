@@ -1,14 +1,13 @@
 import { Theme } from "../themes/palette.slint";
 import { MoonCard } from "../components/card.slint";
 import { MoonProgressBar } from "../components/progress_bar.slint";
+import { ScrollView } from "std-widgets.slint";
 import { StorageItem } from "../models.slint";
 
 export component StoragePage {
     in property <[StorageItem]> storage_items: [];
 
-    Flickable {
-        viewport-height: 800px;
-
+    ScrollView {
         VerticalLayout {
             padding: 24px;
             spacing: 20px;
@@ -37,9 +36,9 @@ export component StoragePage {
                 border-radius: Theme.radius_md;
                 border-width: 1px;
                 border-color: Theme.border;
-                padding: 14px;
 
                 HorizontalLayout {
+                    padding: 14px;
                     spacing: 12px;
                     alignment: start;
 

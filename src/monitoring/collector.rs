@@ -84,7 +84,7 @@ impl CentralCollector {
         let storage = self.storage_collector.collect();
         let (processes, total_process_count) =
             self.processes_collector
-                .collect(&mut self.sys, search_query, sort_order, 50);
+                .collect(&mut self.sys, search_query, sort_order, 250);
         let system_info = self.system_collector.collect(&self.sys);
         let (self_cpu, self_ram) = self.self_monitor.collect(&self.sys);
 

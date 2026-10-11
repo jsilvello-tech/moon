@@ -1,6 +1,7 @@
 import { Theme } from "../themes/palette.slint";
 import { MoonCard } from "../components/card.slint";
 import { MoonBadge } from "../components/badge.slint";
+import { ScrollView } from "std-widgets.slint";
 
 export component SettingsPage {
     in-out property <bool> dark_mode: true;
@@ -20,9 +21,7 @@ export component SettingsPage {
     callback toggle_pause();
     callback restore_defaults();
 
-    Flickable {
-        viewport-height: 850px;
-
+    ScrollView {
         VerticalLayout {
             padding: 24px;
             spacing: 20px;

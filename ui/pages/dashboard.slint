@@ -3,6 +3,7 @@ import { MoonCard } from "../components/card.slint";
 import { MoonSparkline } from "../components/sparkline.slint";
 import { MoonProgressBar } from "../components/progress_bar.slint";
 import { LunarPhaseIndicator } from "../components/lunar_phase.slint";
+import { ScrollView } from "std-widgets.slint";
 
 import { StorageItem } from "../models.slint";
 
@@ -37,9 +38,7 @@ export component DashboardPage {
     // Storage Info
     in property <[StorageItem]> storage_items: [];
 
-    Flickable {
-        viewport-height: 860px;
-
+    ScrollView {
         VerticalLayout {
             padding: 24px;
             spacing: 20px;
@@ -50,9 +49,9 @@ export component DashboardPage {
                 border-radius: Theme.radius_md;
                 border-width: 1px;
                 border-color: Theme.border;
-                padding: 16px;
 
                 HorizontalLayout {
+                    padding: 16px;
                     alignment: space-between;
 
                     // System Identity

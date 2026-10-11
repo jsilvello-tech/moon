@@ -1,6 +1,7 @@
 import { Theme } from "../themes/palette.slint";
 import { MoonCard } from "../components/card.slint";
 import { MoonProgressBar } from "../components/progress_bar.slint";
+import { ScrollView } from "std-widgets.slint";
 
 import { GpuAdapterInfo } from "../models.slint";
 
@@ -8,9 +9,7 @@ export component GpuPage {
     in property <[GpuAdapterInfo]> adapters: [];
     in property <bool> has_gpu_detected: false;
 
-    Flickable {
-        viewport-height: 800px;
-
+    ScrollView {
         VerticalLayout {
             padding: 24px;
             spacing: 20px;
@@ -39,9 +38,9 @@ export component GpuPage {
                 border-radius: Theme.radius_md;
                 border-width: 1px;
                 border-color: Theme.border;
-                padding: 16px;
 
                 HorizontalLayout {
+                    padding: 16px;
                     spacing: 16px;
                     alignment: start;
 

@@ -24,10 +24,30 @@ impl ProcessesCollector {
             .processes()
             .iter()
             .filter_map(|(pid, proc_info)| {
-                let name = proc_info.name().to_string_lossy().to_string();
-                if query.is_empty() || name.to_lowercase().contains(&query) {
+                let pid_u32 = pid.as_u32();
+                let pid_str = pid_u32.to_string();
+                let raw_name = proc_info.name().to_string_lossy().to_string();
+                let name = if raw_name.trim().is_empty() {
+                    if pid_u32 == 0 {
+                        "Processo Ocioso do Sistema".to_string()
+                    } else {
+                        proc_info
+                            .exe()
+                            .and_then(|e| e.file_name())
+                            .map(|n| n.to_string_lossy().to_string())
+                            .unwrap_or_else(|| format!("Processo ({pid_u32})"))
+                    }
+                } else {
+                    raw_name
+                };
+
+                let matches_query = query.is_empty()
+                    || name.to_lowercase().contains(&query)
+                    || pid_str.contains(&query);
+
+                if matches_query {
                     Some(ProcessDetail {
-                        pid: pid.as_u32(),
+                        pid: pid_u32,
                         name,
                         cpu_usage_percent: proc_info.cpu_usage(),
                         memory_bytes: proc_info.memory(),

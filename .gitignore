@@ -18,6 +18,8 @@ Desktop.ini
 
 # Output archives & installer
 dist/*.zip
+dist/**/*.exe
+dist/**/*.dll
 installer/Output/
 *.log
 scratch/

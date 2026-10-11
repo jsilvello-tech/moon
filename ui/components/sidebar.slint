@@ -330,13 +330,13 @@ export component MoonSidebar {
 
             // Collection Status indicator at bottom of sidebar
             Rectangle {
-                padding: 10px;
                 border-radius: Theme.radius_sm;
                 background: root.is_paused ? #331518 : #0B1C22;
                 border-width: 1px;
                 border-color: root.is_paused ? Theme.eclipse_red.transparentize(0.5) : Theme.orbit_green.transparentize(0.5);
 
                 HorizontalLayout {
+                    padding: 10px;
                     spacing: 8px;
                     alignment: center;
 

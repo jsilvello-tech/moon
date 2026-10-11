@@ -4,13 +4,13 @@ use crate::settings::{AppSettings, SettingsManager};
 use crate::utils::formatters::{
     format_bytes_gib, format_frequency, format_storage_bytes, format_uptime,
 };
-use slint::{ComponentHandle, ModelRc, SharedString, VecModel};
+use slint::{ComponentHandle, ModelRc, VecModel};
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
 use std::time::Duration;
-use tracing::{error, info};
+use tracing::info;
 
 slint::include_modules!();
 
@@ -53,11 +53,13 @@ impl MoonMonitorApp {
             search_query: String::new(),
             sort_order: ProcessSortOrder::CpuDesc,
         }));
+        let condvar = Arc::new(Condvar::new());
 
         let is_running = Arc::new(AtomicBool::new(true));
 
         // Inicializa a thread de coleta em segundo plano
         let thread_shared = Arc::clone(&shared_state);
+        let thread_condvar = Arc::clone(&condvar);
         let thread_running = Arc::clone(&is_running);
         let weak_ui = main_window.as_weak();
 
@@ -84,7 +86,6 @@ impl MoonMonitorApp {
                         let snapshot = collector.collect_snapshot(&search_query, sort_order);
 
                         // Envia snapshot para a thread principal do Slint de forma segura
-                        let ui_upgrade = weak_ui.clone();
                         let result = weak_ui.upgrade_in_event_loop(move |ui| {
                             Self::apply_snapshot_to_ui(&ui, snapshot);
                         });
@@ -96,14 +97,15 @@ impl MoonMonitorApp {
                         }
                     }
 
-                    // Pausa entre amostragens respeitando o intervalo configurado
+                    // Pausa entre amostragens respeitando o intervalo ou despertando imediatamente em buscas
                     let sleep_duration = if is_paused {
                         Duration::from_millis(500)
                     } else {
                         Duration::from_secs(interval_secs.max(1))
                     };
 
-                    thread::sleep(sleep_duration);
+                    let lock = thread_shared.lock().unwrap();
+                    let _ = thread_condvar.wait_timeout(lock, sleep_duration);
                 }
 
                 info!("Thread de telemetria finalizada de forma segura.");
@@ -112,18 +114,21 @@ impl MoonMonitorApp {
 
         // Callbacks de interação do usuário
         let cb_shared = Arc::clone(&shared_state);
-        let settings_mgr = SettingsManager::new();
+        let cb_condvar = Arc::clone(&condvar);
 
         // 1. Busca de Processos
         let search_state = Arc::clone(&cb_shared);
+        let search_cv = Arc::clone(&cb_condvar);
         main_window.on_search_changed(move |query| {
             if let Ok(mut lock) = search_state.lock() {
                 lock.search_query = query.to_string();
             }
+            search_cv.notify_one();
         });
 
         // 2. Ordenação de Processos
         let sort_state = Arc::clone(&cb_shared);
+        let sort_cv = Arc::clone(&cb_condvar);
         main_window.on_sort_changed(move |sort_id| {
             if let Ok(mut lock) = sort_state.lock() {
                 lock.sort_order = if sort_id == 1 {
@@ -132,6 +137,7 @@ impl MoonMonitorApp {
                     ProcessSortOrder::CpuDesc
                 };
             }
+            sort_cv.notify_one();
         });
 
         // 3. Seleção de Processo
@@ -154,6 +160,7 @@ impl MoonMonitorApp {
         // 5. Alteração de Intervalo
         let mgr_interval = SettingsManager::new();
         let interval_state = Arc::clone(&cb_shared);
+        let interval_cv = Arc::clone(&cb_condvar);
         main_window.on_set_interval(move |secs| {
             let s = secs as u64;
             if let Ok(mut lock) = interval_state.lock() {
@@ -162,6 +169,7 @@ impl MoonMonitorApp {
             let mut current = mgr_interval.load();
             current.update_interval_secs = s;
             mgr_interval.save(&current);
+            interval_cv.notify_one();
         });
 
         // 6. Microanimações
@@ -179,6 +187,7 @@ impl MoonMonitorApp {
         // 7. Pausa / Retomada
         let mgr_pause = SettingsManager::new();
         let pause_state = Arc::clone(&cb_shared);
+        let pause_cv = Arc::clone(&cb_condvar);
         let ui_handle_pause = main_window.as_weak();
         main_window.on_toggle_pause(move || {
             if let Some(ui) = ui_handle_pause.upgrade() {
@@ -189,12 +198,14 @@ impl MoonMonitorApp {
                 let mut current = mgr_pause.load();
                 current.is_paused = paused;
                 mgr_pause.save(&current);
+                pause_cv.notify_one();
             }
         });
 
         // 8. Restaurar Padrões
         let mgr_restore = SettingsManager::new();
         let restore_state = Arc::clone(&cb_shared);
+        let restore_cv = Arc::clone(&cb_condvar);
         let ui_handle_restore = main_window.as_weak();
         main_window.on_restore_defaults(move || {
             let defaults = AppSettings::default();
@@ -209,6 +220,7 @@ impl MoonMonitorApp {
                 ui.set_animations_enabled(defaults.animations_enabled);
                 ui.set_is_paused(defaults.is_paused);
             }
+            restore_cv.notify_one();
         });
 
         info!("Janela do Moon Monitor exibida. Entrando no loop principal do Slint...");
