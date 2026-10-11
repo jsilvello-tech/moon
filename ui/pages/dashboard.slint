@@ -353,14 +353,14 @@ export component DashboardPage {
                                 alignment: space-between;
 
                                 Text {
-                                    text: "\{disk.mount_point} (\{disk.name != \"\" ? disk.name : \"Volume\"}) - \{disk.fs_type}";
+                                    text: disk.name != "" ? "\{disk.mount_point} (\{disk.name}) - \{disk.fs_type}" : "\{disk.mount_point} (Volume) - \{disk.fs_type}";
                                     font-size: 12px;
                                     font-weight: 600;
                                     color: Theme.text_primary;
                                 }
 
                                 Text {
-                                    text: "\{disk.used_gb} / \{disk.total_gb} (\{Math.round(disk.usage_percent)}%)";
+                                    text: "\{disk.used_gb} / \{disk.total_gb} (\{round(disk.usage_percent)}%)";
                                     font-size: 11px;
                                     color: Theme.text_secondary;
                                 }

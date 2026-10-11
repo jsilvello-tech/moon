@@ -1,5 +1,5 @@
 import { StorageItem, CoreUsage, TopProcessRam, GpuAdapterInfo, ProcessItem } from "models.slint";
-export { StorageItem, CoreUsage, TopProcessRam, GpuAdapterInfo, ProcessItem };
+export { StorageItem, CoreUsage, TopProcessRam, GpuAdapterInfo, ProcessItem }
 import { Theme } from "themes/palette.slint";
 import { MoonSidebar } from "components/sidebar.slint";
 import { DashboardPage } from "pages/dashboard.slint";
@@ -77,10 +77,10 @@ export component MainWindow inherits Window {
     // Processes Telemetry
     in property <[ProcessItem]> processes: [];
     in property <int> total_process_count: 0;
-    in property <int> selected_pid: 0;
-    in property <string> selected_proc_name: "";
-    in property <string> selected_proc_cpu: "";
-    in property <string> selected_proc_mem: "";
+    in-out property <int> selected_pid: 0;
+    in-out property <string> selected_proc_name: "";
+    in-out property <string> selected_proc_cpu: "";
+    in-out property <string> selected_proc_mem: "";
     in-out property <string> search_query: "";
     in-out property <int> sort_by: 0;
 

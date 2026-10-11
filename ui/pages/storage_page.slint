@@ -79,7 +79,7 @@ export component StoragePage {
             }
 
             for disk[idx] in root.storage_items: MoonCard {
-                title: "\{disk.mount_point} — \{disk.name != \"\" ? disk.name : \"Volume do Sistema\"}";
+                title: disk.name != "" ? "\{disk.mount_point} — \{disk.name}" : "\{disk.mount_point} — Volume do Sistema";
                 subtitle: "Sistema de Arquivos: \{disk.fs_type}";
                 accent_color: Theme.orbit_green;
 
