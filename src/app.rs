@@ -45,6 +45,9 @@ impl MoonMonitorApp {
         main_window.set_is_paused(settings.is_paused);
         main_window.set_app_version("0.1.0".into());
         main_window.set_config_path(self.settings_manager.get_path_display().into());
+        // Ajusta e maximiza a janela para preencher e se adaptar à tela do usuário
+        main_window.window().set_maximized(true);
+        info!("Janela maximizada para adaptação total à tela do usuário.");
 
         // Estado compartilhado entre a UI e a thread de coleta
         let shared_state = Arc::new(Mutex::new(CollectorSharedState {

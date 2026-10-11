@@ -12,10 +12,10 @@ import { SettingsPage } from "pages/settings_page.slint";
 
 export component MainWindow inherits Window {
     title: "Moon Monitor — Keep your system in orbit";
-    preferred-width: 1200px;
-    preferred-height: 760px;
-    min-width: 900px;
-    min-height: 600px;
+    preferred-width: 1280px;
+    preferred-height: 800px;
+    min-width: 760px;
+    min-height: 480px;
     background: Theme.background;
     default-font-family: "Segoe UI, -apple-system, sans-serif";
 
@@ -113,6 +113,8 @@ export component MainWindow inherits Window {
 
             // Page 0: Moon Dashboard
             if root.active_page == 0: DashboardPage {
+                width: 100%;
+                height: 100%;
                 hostname: root.hostname;
                 os_version: root.os_version;
                 architecture: root.architecture;
@@ -137,6 +139,8 @@ export component MainWindow inherits Window {
 
             // Page 1: Lunar Core (CPU)
             if root.active_page == 1: CpuPage {
+                width: 100%;
+                height: 100%;
                 cpu_model: root.cpu_name;
                 cpu_vendor: root.cpu_vendor;
                 cpu_total_usage: root.cpu_usage;
@@ -150,6 +154,8 @@ export component MainWindow inherits Window {
 
             // Page 2: Crystal Memory (RAM)
             if root.active_page == 2: MemoryPage {
+                width: 100%;
+                height: 100%;
                 ram_total: root.ram_total;
                 ram_used: root.ram_used;
                 ram_available: root.ram_available;
@@ -164,17 +170,23 @@ export component MainWindow inherits Window {
 
             // Page 3: Eclipse Graphics (GPU)
             if root.active_page == 3: GpuPage {
+                width: 100%;
+                height: 100%;
                 adapters: root.gpu_adapters;
                 has_gpu_detected: root.has_gpu_detected;
             }
 
             // Page 4: Moon Storage
             if root.active_page == 4: StoragePage {
+                width: 100%;
+                height: 100%;
                 storage_items: root.storage_items;
             }
 
             // Page 5: Orbit Processes
             if root.active_page == 5: ProcessesPage {
+                width: 100%;
+                height: 100%;
                 processes: root.processes;
                 total_process_count: root.total_process_count;
                 selected_pid: root.selected_pid;
@@ -197,6 +209,8 @@ export component MainWindow inherits Window {
 
             // Page 6: Lunar Settings
             if root.active_page == 6: SettingsPage {
+                width: 100%;
+                height: 100%;
                 dark_mode <=> root.dark_mode;
                 update_interval_secs <=> root.update_interval_secs;
                 animations_enabled <=> root.animations_enabled;

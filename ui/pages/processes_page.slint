@@ -20,6 +20,8 @@ export component ProcessesPage {
     callback process_selected(int, string, string, string);
 
     VerticalLayout {
+        width: 100%;
+        height: 100%;
         padding: 24px;
         spacing: 16px;
 
@@ -259,9 +261,11 @@ export component ProcessesPage {
 
         // Processes List
         ScrollView {
+            horizontal-stretch: 1;
             vertical-stretch: 1;
 
             VerticalLayout {
+                width: parent.width;
                 padding-right: 8px;
                 spacing: 2px;
                 min-height: root.processes.length > 0 ? (root.processes.length * 38px) : 120px;

@@ -19,8 +19,13 @@ export component MemoryPage {
     in property <[TopProcessRam]> top_memory_processes: [];
 
     ScrollView {
+        width: 100%;
+        height: 100%;
+
         VerticalLayout {
+            width: parent.width;
             padding: 24px;
+            padding-right: 32px;
             spacing: 20px;
 
             // Header Section
