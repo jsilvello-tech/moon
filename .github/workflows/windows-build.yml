@@ -26,17 +26,7 @@ jobs:
         run: cargo fmt --check
 
       - name: Run Cargo Check
-        shell: pwsh
-        run: |
-          cargo check --verbose 2>&1 | Tee-Object -FilePath check.log
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "CARGO CHECK FAILED!"
-            "### Cargo Check Failure Log" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-            "```" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-            Get-Content check.log -Tail 150 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-            "```" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-            exit 1
-          }
+        run: cargo check
 
       - name: Run Clippy Linter
         run: cargo clippy --all-targets
@@ -75,12 +65,4 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Upload Logs on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-failure-logs
-          path: |
-            check.log
-          if-no-files-found: ignore
 
